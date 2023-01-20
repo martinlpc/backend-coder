@@ -6,31 +6,33 @@ class ProductManager {
     addProduct(productObj) {
         // Check if the product has missing data (empty value)
         if (Object.values(productObj).includes("") || Object.values(productObj).includes(null)) {
-            return console.log("Missing product field");
+            console.log("Missing product field");
         } else {
             // Check existing code
             const repeatedCode = this.products.find((prod) => prod.code === productObj.code);
             if (repeatedCode) {
-                return console.error("Code " + productObj.code + " already exists");
+                console.log("Code " + productObj.code + " already exists");
             } else {
                 // Push obj to the array
                 this.products.push({ ...productObj, id: this.products.length + 1 });
-                console.log("Product has been added");
+                console.log("Product added");
             }
         }
     }
 
     getProducts() {
-        console.log("Products:");
-        return console.log(this.products);
+        console.log("Products:"); //Para mostrar en terminal
+        console.log(this.products); //Para mostrar en terminal
+        return this.products;
     }
 
     getProductByID(id) {
         let found = this.products.find((prod) => prod.id === id);
         if (found) {
-            return console.log(found);
+            console.log(found); //Para mostrar en terminal
+            return found;
         } else {
-            return console.error("Not found");
+            console.log("Not found");
         }
     }
 }
