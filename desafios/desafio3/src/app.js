@@ -6,6 +6,7 @@ const PORT = 8080;
 const manager = new ProductManager("./src/database.json");
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("Desafío #3 - Servidor con express");
