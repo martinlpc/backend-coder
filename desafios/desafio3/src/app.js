@@ -25,7 +25,7 @@ app.get("/products", async (req, res) => {
 });
 
 app.get("/products/:pid", async (req, res) => {
-    const product = await manager.getProductByID(parseInt(req.params.pid));
+    const product = await manager.getProductById(parseInt(req.params.pid));
     product === null ? res.send("No se encontró el producto") : res.send(product);
 });
 

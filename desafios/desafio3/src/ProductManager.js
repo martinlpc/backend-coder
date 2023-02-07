@@ -51,7 +51,7 @@ class ProductManager {
         }
     }
 
-    async getProductByID(id) {
+    async getProductById(id) {
         this.checkFile();
         try {
             const read = await fs.readFile(this.path, "utf-8");
