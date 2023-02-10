@@ -1,19 +1,10 @@
 import { Router } from 'express'
-import ProductManager from '../controllers/ProductManager';
+import ProductManager from '../controllers/ProductManager.js';
 
 const routerProduct = Router()
-const manager = new ProductManager('src/models/database.json')
+const manager = new ProductManager('src/models/products.json')
 
-/* 
- TODO: Testear todo el endpoint
- TODO: Replicar algo similar para cartRoutes
-*/
-
-routerProduct.get('/', (req, res) => {
-    res.send("API PRODUCTS");
-});
-
-routerProduct.get('/products', async (req, res) => {
+routerProduct.get('/', async (req, res) => {
     const products = await manager.getProducts();
     let { limit } = req.query;
     let data;
@@ -25,23 +16,23 @@ routerProduct.get('/products', async (req, res) => {
     res.send(data);
 });
 
-routerProduct.get("/products/:pid", async (req, res) => {
+routerProduct.get("/:pid", async (req, res) => {
     const product = await manager.getProductById(parseInt(req.params.pid));
-    product === null ? res.send("No se encontró el producto") : res.send(product);
+    product === null ? res.send("Product not found") : res.send(product);
 });
 
 routerProduct.post('/', async (req, res) => {
-    let { title, description, code, price, status, stock, category, thumbnails } = req.body;
+    let { title, description, price, category, thumbnails, code, stock, status } = req.body;
     await manager.addProduct(title, description, price, category, thumbnails, code, stock, status)
     res.send("Product added to the database");
 })
 
-routerProduct.put('/:id', async (req, res) => {
+routerProduct.put('/:pid', async (req, res) => {
     let data = await manager.updateProduct(req.params.id, req.body)
-    res.send(data)
+    data && res.send(data)
 })
 
-routerProduct.delete('/:id', async (req, res) => {
+routerProduct.delete('/:pid', async (req, res) => {
     let data = await manager.deleteProduct(req.params.id)
     res.send(data)
 })

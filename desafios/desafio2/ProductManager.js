@@ -10,15 +10,10 @@ class ProductManager {
         !existsSync(this.path) && writeFileSync(this.path, "[]", "utf-8");
     };
 
-    async addProduct(title, description, price, category, thumbnails = [], code, stock, status = true) {
-        const prodObj = { title, description, price, category, thumbnails, code, stock, status };
+    async addProduct(title, description, price, thumbnail, code, stock) {
+        const prodObj = { title, description, price, thumbnail, code, stock };
 
         // Check if the product has missing data (empty value)
-        /*
-            TODO: Agregar excepcion de chequeo para el valor thumbnails, ya
-            TODO: que no es obligatorio que tenga data (sin imgs)
-        */
-
         if (Object.values(prodObj).includes("") || Object.values(prodObj).includes(null)) {
             console.log("Missing product field");
         } else {
@@ -49,14 +44,14 @@ class ProductManager {
         try {
             const read = await fs.readFile(this.path, "utf-8");
             let data = JSON.parse(read);
+            console.log(data);
             return data;
         } catch (err) {
             console.error(err);
-            return null;
         }
     }
 
-    async getProductById(id) {
+    async getProductByID(id) {
         this.checkFile();
         try {
             const read = await fs.readFile(this.path, "utf-8");
@@ -65,16 +60,15 @@ class ProductManager {
             if (!found) {
                 throw "ID not found";
             } else {
-                //console.log(found);
+                console.log(found);
                 return found;
             }
         } catch (err) {
             console.error(err);
-            return null;
         }
     }
 
-    async updateProduct(id, title, description, price, category, thumbnails, code, stock, status = true) {
+    async updateProduct(id, title, description, price, thumbnail, code, stock) {
         this.checkFile();
         try {
             const read = await fs.readFile(this.path, "utf-8");
@@ -83,15 +77,13 @@ class ProductManager {
                 const index = data.findIndex((prod) => prod.id === id);
                 data[index].title = title;
                 data[index].description = description;
-                data[index].category = category;
                 data[index].price = price;
-                data[index].thumbnails = thumbnails;
+                data[index].thumbnail = thumbnail;
                 data[index].code = code;
                 data[index].stock = stock;
-                data[index].status = status;
                 await fs.writeFile(this.path, JSON.stringify(data), "utf-8");
             } else {
-                throw "ID " + id + " not found";
+                throw "ID not found";
             }
         } catch (err) {
             console.log(err);
@@ -116,5 +108,16 @@ class ProductManager {
     }
 }
 
-export default ProductManager;
-
+// TESTING
+// - Crear instancia de ProductManager
+const manager = new ProductManager("./database.json");
+// - Agregar productos
+//manager.addProduct("producto prueba1", "Este es un producto prueba1", 200, "Sin imagen", "abc123", 25);
+//manager.addProduct("producto prueba2", "Este es un producto prueba2", 200, "Sin imagen", "bc123", 25);
+//manager.addProduct("producto prueba3", "Este es un producto prueba3", 200, "Sin imagen", "c123", 25);
+//manager.addProduct("producto prueba4", "Este es un producto prueba4", 200, "Sin imagen", "123", 25);
+//manager.addProduct("producto prueba5", "Este es un producto prueba5", 200, "Sin imagen", "23", 25);
+manager.getProducts();
+//manager.getProductByID(2);
+//manager.updateProduct(...)
+//manager.deleteProduct(3)
