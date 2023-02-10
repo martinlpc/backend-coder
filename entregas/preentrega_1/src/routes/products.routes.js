@@ -22,18 +22,19 @@ routerProduct.get("/:pid", async (req, res) => {
 });
 
 routerProduct.post('/', async (req, res) => {
-    let { title, description, price, category, thumbnails, code, stock, status } = req.body;
-    await manager.addProduct(title, description, price, category, thumbnails, code, stock, status)
-    res.send("Product added to the database");
+    let { title, description, code, price, status, stock, category, thumbnails } = req.body;
+    const data = await manager.addProduct(title, description, code, price, status, stock, category, thumbnails)
+    res.send(`${data}`);
 })
 
 routerProduct.put('/:pid', async (req, res) => {
-    let data = await manager.updateProduct(req.params.id, req.body)
+    let { title, description, code, price, status, stock, category, thumbnails } = req.body
+    let data = await manager.updateProduct(parseInt(req.params.pid), title, description, code, price, status, stock, category, thumbnails)
     data && res.send(data)
 })
 
 routerProduct.delete('/:pid', async (req, res) => {
-    let data = await manager.deleteProduct(req.params.id)
+    let data = await manager.deleteProduct(parseInt(req.params.pid))
     res.send(data)
 })
 

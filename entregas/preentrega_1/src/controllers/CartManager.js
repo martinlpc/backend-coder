@@ -45,7 +45,7 @@ export class CartManager {
             // Check existing cart id
             const foundCartIndex = data.findIndex(elem => elem.id === cartId)
             if (foundCartIndex === -1) {
-                throw "Cart ID not found"
+                throw `Cart ID not found`
             } else {
                 // Extract products array
                 const cartObj = new Cart(cartId, data[foundCartIndex].products)
@@ -65,7 +65,7 @@ export class CartManager {
             return true;
         } catch (err) {
             console.error(err);
-            return null
+            return err
         }
     }
 
@@ -83,6 +83,35 @@ export class CartManager {
         } catch (err) {
             console.error(err)
             return null
+        }
+    }
+
+    async removeProductById(cartId, prodId) {
+        this.checkFile()
+        try {
+            // Reading file
+            const read = await fs.readFile(this.path, "utf-8");
+            let data = JSON.parse(read);
+            // Check existing cart id
+            const foundCartIndex = data.findIndex(elem => elem.id === cartId)
+            if (foundCartIndex === -1) {
+                return `Cart ID not found`
+            } else {
+                // Extract products array
+                const cartObj = new Cart(cartId, data[foundCartIndex].products)
+                const foundProdIndex = cartObj.products.findIndex(elem => elem.product === prodId)
+                if (foundProdIndex === -1) {
+                    return `Product id "${prodId}" not found on cart id "${cartId}"`
+                } else {
+                    // Remove product (total quantity)
+                    data[foundCartIndex].products.splice(foundProdIndex, 1)
+                    await fs.writeFile(this.path, JSON.stringify(data), "utf-8");
+                    return true
+                }
+            }
+        } catch (err) {
+            console.error(err)
+            return err
         }
     }
 }

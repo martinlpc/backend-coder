@@ -10,17 +10,12 @@ class ProductManager {
         !existsSync(this.path) && writeFileSync(this.path, "[]", "utf-8");
     };
 
-    async addProduct(title, description, price, category, thumbnails = [], code, stock, status = true) {
-        const prodObj = { title, description, price, category, thumbnails, code, stock, status };
+    async addProduct(title, description, code, price, status = true, stock, category, thumbnails = []) {
+        const prodObj = { title, description, code, price, status, stock, category, thumbnails };
 
         // Check if the product has missing data (empty value)
-        /*
-            TODO: Agregar excepcion de chequeo para el valor thumbnails, ya
-            TODO: que no es obligatorio que tenga data (sin imgs)
-        */
-
         if (Object.values(prodObj).includes("") || Object.values(prodObj).includes(null)) {
-            console.log("Missing product field");
+            return `Missing product field`
         } else {
             this.checkFile();
             try {
@@ -29,7 +24,7 @@ class ProductManager {
                 let data = JSON.parse(read);
                 // Check existing product code
                 if (data.some((elem) => elem.code === prodObj.code)) {
-                    throw "Code " + code + " already exists, cannot add";
+                    throw `Code "${code}" already exists, cannot add`;
                 } else {
                     let newID;
                     !data.length ? (newID = 1) : (newID = data[data.length - 1].id + 1);
@@ -37,9 +32,11 @@ class ProductManager {
                     data.push({ ...prodObj, id: newID });
                     // Write data to the file
                     await fs.writeFile(this.path, JSON.stringify(data), "utf-8");
+                    return newID
                 }
             } catch (err) {
                 console.error(err);
+                return err
             }
         }
     }
@@ -63,7 +60,8 @@ class ProductManager {
             const data = JSON.parse(read);
             const found = data.find((prod) => prod.id === id);
             if (!found) {
-                throw "ID not found";
+                console.log(`ID not found`)
+                return false
             } else {
                 //console.log(found);
                 return found;
@@ -74,7 +72,7 @@ class ProductManager {
         }
     }
 
-    async updateProduct(id, title, description, price, category, thumbnails, code, stock, status = true) {
+    async updateProduct(id, title, description, code, price, status = true, stock, category, thumbnails = []) {
         this.checkFile();
         try {
             const read = await fs.readFile(this.path, "utf-8");
@@ -90,11 +88,13 @@ class ProductManager {
                 data[index].stock = stock;
                 data[index].status = status;
                 await fs.writeFile(this.path, JSON.stringify(data), "utf-8");
+                return true
             } else {
-                throw "ID " + id + " not found";
+                throw `ID "${id}" not found`;
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            return err
         }
     }
 
@@ -107,11 +107,13 @@ class ProductManager {
             if (index !== -1) {
                 data.splice(index, 1);
                 await fs.writeFile(this.path, JSON.stringify(data), "utf-8");
+                return true
             } else {
-                throw "ID " + id + " not found";
+                throw `ID "${id}" not found`;;
             }
         } catch (err) {
             console.log(err);
+            return err
         }
     }
 }
