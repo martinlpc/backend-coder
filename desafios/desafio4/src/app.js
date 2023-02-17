@@ -21,12 +21,13 @@ io.on("connection", async (socket) => {
     console.log("Cliente conectado")
 
     socket.on("addProduct", async info => {
-        const newProduct = { ...info, status: true };
-        socket.emit("msgProductAdded", await productManager.addProduct(newProduct))
+        socket.emit("msgProductAdded", await productManager.addProduct(info.title, info.description, info.code, info.price, true, info.stock, info.category, info.thumbnails))
+        socket.emit("getProducts", await productManager.getProducts())
     })
 
     socket.on("deleteProduct", async id => {
-        socket.emit("msgProductDeleted", await productManager.deleteProductById(id))
+        socket.emit("msgProductDeleted", await productManager.deleteProduct(parseInt(id)))
+        socket.emit("getProducts", await productManager.getProducts())
     })
 
     socket.emit("getProducts", await productManager.getProducts());
