@@ -1,7 +1,8 @@
 import { Router } from 'express'
-import { CartManager } from '../controllers/CartManager.js'
-import ProductManager from '../controllers/ProductManager.js'
+import { CartManager } from '../dao/FileSystem/CartManager.js'
+import { getManagerProducts } from '../dao/daoManager.js'
 
+const selectedDB = process.env.DBSELECTION
 const routerCart = Router()
 const cartManager = new CartManager('src/models/carts.json')
 const prodManager = new ProductManager('src/models/products.json')

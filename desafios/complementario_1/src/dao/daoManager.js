@@ -1,22 +1,20 @@
-const selectedDB = process.env.DBSELECTION
-
-export const getManagerMsg = async () => {
-    const modelMsg = selectedDB === 1
-        ? await import('./MongoDB/models/Message.js') // MongoDB 
-        : await import('./Postgresql/models/Message.js') // SQL (postgres)
-    return modelMsg
+export const getManagerMessages = async () => {
+    const modelMessage = process.env.DBSELECTION == 1
+        ? await import('./MongoDB/models/Message.js').then(module => module.default) // MongoDB 
+        : await import('./Postgresql/models/Message.js').then(module => module.default) // SQL (postgres)
+    return modelMessage
 }
 
-export const getManagerProd = async () => {
-    const modelProd = selectedDB === 1
-        ? await import('./MongoDB/models/Product.js') // MongoDB 
-        : await import('./Postgresql/models/Product.js') // SQL (postgres)
-    return modelProd
+export const getManagerProducts = async () => {
+    const modelProduct = process.env.DBSELECTION == 1
+        ? await import('./MongoDB/models/Product.js').then(module => module.default) // MongoDB 
+        : await import('./Postgresql/models/Product.js').then(module => module.default) // SQL (postgres)
+    return modelProduct
 }
 
-export const getManagerCart = async () => {
-    const modelCart = selectedDB === 1
-        ? await import('./MongoDB/models/Cart.js') // MongoDB 
-        : await import('./Postgresql/models/Cart.js') // SQL (postgres)
+export const getManagerCarts = async () => {
+    const modelCart = process.env.DBSELECTION == 1
+        ? await import('./MongoDB/models/Cart.js'.then(module => module.default)) // MongoDB 
+        : await import('./Postgresql/models/Cart.js').then(module => module.default)  // SQL (postgres)
     return modelCart
 }

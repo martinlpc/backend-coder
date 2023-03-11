@@ -1,21 +1,31 @@
-import { ManagerMongoDB } from "../../../db/mongoDBManager";
+import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
 import { Schema } from "mongoose";
 
 const url = process.env.URLMONGODB
 
 const messageSchema = new Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
-        unique: true
+        required: true
     },
-    message: String
+    message: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
 })
 
-export class ManagerMessageMongoDB extends ManagerMongoDB {
+class ManagerMessageMongoDB extends ManagerMongoDB {
     constructor() {
         super(url, "messages", messageSchema)
-        // Aqui irian los atributos propios de la clase
     }
-    // Aqui irian los métodos propios de la clase
 }
+
+export default ManagerMessageMongoDB

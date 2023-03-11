@@ -13,7 +13,7 @@ export class ManagerMongoDB {
     async #setConnection() {
         try {
             await mongoose.connect(this.#url)
-            console.log("DB Connected")
+            console.log("Connected to MongoDB")
         } catch (error) {
             return error
         }
@@ -28,10 +28,10 @@ export class ManagerMongoDB {
         }
     }
 
-    async getElements() {
+    async getElements(limit) {
         this.#setConnection()
         try {
-            return await this.model.find()
+            return await this.model.find().limit(limit)
         } catch (error) {
             return error
         }

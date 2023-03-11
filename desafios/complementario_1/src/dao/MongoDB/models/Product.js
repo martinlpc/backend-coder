@@ -1,4 +1,4 @@
-import { ManagerMongoDB } from "../../../db/mongoDBManager";
+import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
 import { Schema } from "mongoose";
 
 const url = process.env.URLMONGODB
@@ -40,11 +40,12 @@ const productSchema = new Schema({
     }
 })
 
-class ManagerProductMongoDB extends ManagerMongoDB {
+class ManagerProductsMongoDB extends ManagerMongoDB {
     constructor() {
         super(url, "products", productSchema)
     }
 }
 
 // Exporting an instance of the class ready to use
-export const managerProducts = new ManagerProductMongoDB();
+//export const managerProducts = new ManagerProductsMongoDB();
+export default ManagerProductsMongoDB
