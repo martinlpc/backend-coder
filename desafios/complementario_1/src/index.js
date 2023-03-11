@@ -45,6 +45,12 @@ io.on("connection", async (socket) => {
         console.log(messages)
         io.emit("allMessages", messages)
     })
+
+    socket.on("load messages", async () => {
+        const messages = await managerMessages.getElements()
+        console.log(messages)
+        io.emit("allMessages", messages)
+    })
 })
 
 // Routes
