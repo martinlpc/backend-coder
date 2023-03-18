@@ -1,7 +1,7 @@
 // * Server
 import 'dotenv/config'
 import routerProduct from "./routes/products.routes.js";
-//import routerCart from "./routes/carts.routes.js";
+import routerCart from "./routes/carts.routes.js";
 import routerSocket from "./routes/socket.routes.js";
 import express from 'express'
 import { engine } from 'express-handlebars'
@@ -24,7 +24,6 @@ app.set('views', path.resolve(__dirname, './views'))
 // Port setting
 app.set("port", process.env.PORT || 8080)
 
-
 // Server launch
 const server = app.listen(app.get("port"), () => {
     console.log(`Server running on http://localhost:${app.get("port")}`)
@@ -33,8 +32,8 @@ const server = app.listen(app.get("port"), () => {
 // ServerIO to manage socket messages (chat)
 const io = new Server(server)
 
-const data = await getManagerMessages();
-const managerMessages = new data();
+// const data = await getManagerMessages();
+// export const managerMessages = new data();
 
 io.on("connection", async (socket) => {
     console.log("Connection detected")
@@ -57,6 +56,6 @@ io.on("connection", async (socket) => {
 app.use('/', express.static(__dirname + '/public'))
 app.use('/', routerSocket)
 app.use('/api/products', routerProduct)
-//app.use('/api/carts', routerCart)
+app.use('/api/carts', routerCart)
 app.use('/realtimeproducts', routerSocket)
 app.use('/chat', routerSocket)

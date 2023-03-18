@@ -26,8 +26,6 @@ class ManagerMessageMongoDB extends ManagerMongoDB {
     constructor() {
         super(url, "messages", messageSchema)
     }
-
-    // * agregar métodos propios del modelo de mensajes
 }
 
 

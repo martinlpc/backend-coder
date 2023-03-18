@@ -14,7 +14,7 @@ export const getManagerProducts = async () => {
 
 export const getManagerCarts = async () => {
     const modelCart = process.env.DBSELECTION == 1
-        ? await import('./MongoDB/models/Cart.js'.then(module => module.default)) // MongoDB 
+        ? await import('./MongoDB/models/Cart.js').then(module => module.default) // MongoDB 
         : await import('./Postgresql/models/Cart.js').then(module => module.default)  // SQL (postgres)
     return modelCart
 }

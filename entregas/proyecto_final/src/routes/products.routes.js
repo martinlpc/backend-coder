@@ -1,118 +1,84 @@
 import { Router } from 'express'
 import { getManagerProducts } from '../dao/daoManager.js'
 
-const selectedDB = process.env.DBSELECTION
 const routerProduct = Router()
 const managerData = await getManagerProducts()
 const manager = new managerData()
 
 routerProduct.get('/', async (req, res) => {
     let { limit = 10, page = 1, query = undefined, sort = undefined } = req.query;
-    if (selectedDB == 1) {
-        // Pagination filter and options
-        const filter = {}
-        if (query) filter.category = query
 
-        const options = {
-            page: page,
-            limit: limit,
-            sort: sort && Object.keys(sort).length ? sort : undefined
-        };
+    // Pagination filter and options
+    const filter = { stock: { $gt: 0 } } // Showing products with stock >= 1
+    if (query) filter.category = query
+    const options = {
+        page: page,
+        limit: limit,
+        sort: sort && Object.keys(sort).length ? sort : undefined
+    };
 
-        // Sorting definition, if no parameter is received, do not sort
-        if (sort != undefined) {
-            if (sort != "ASC" && sort != "DESC") {
-                throw "Invalid sorting parameter"
-            } else {
-                sort == "ASC" ? options.sort = "price" : options.sort = "-price"
-            }
+    // Sorting definition, if no parameter is received, do not sort
+    if (sort != undefined) {
+        if (sort != "ASC" && sort != "DESC") {
+            throw "Invalid sorting parameter"
+        } else {
+            sort == "ASC" ? options.sort = "price" : options.sort = "-price"
         }
-
-        // DB request
-        try {
-            // Getting paginated and filtered products
-            const products = await manager.paginate(filter, options)
-
-            // Creating links to prev and next pages
-            let prevPageLink, nextPageLink
-            if (query) {
-                prevPageLink = products.hasPrevPage ? `/api/products?limit=${limit}&page=${products.prevPage}&query=${query}&sort=${sort}` : null
-                nextPageLink = products.hasNextPage ? `/api/products?limit=${limit}&page=${products.nextPage}&query=${query}&sort=${sort}` : null
-            } else {
-                prevPageLink = products.hasPrevPage ? `/api/products?limit=${limit}&page=${products.prevPage}&sort=${sort}` : null
-                nextPageLink = products.hasNextPage ? `/api/products?limit=${limit}&page=${products.nextPage}&sort=${sort}` : null
-            }
-
-            const response = {
-                status: "success",
-                payload: products.docs,
-                totalPages: products.totalPages,
-                prevPage: products.prevPage,
-                nextPage: products.nextPage,
-                page: products.page,
-                hasPrevPage: products.hasPrevPage,
-                hasNextPage: products.hasNextPage,
-                prevLink: prevPageLink,
-                nextLink: nextPageLink
-            }
-
-            res.send({ response })
-        } catch (error) {
-            res.send({ error })
-        }
-
-    } else {
-        // SQL not implemented
     }
 
+    // DB request
+    try {
+        // Getting paginated and filtered products
+        const products = await manager.paginate(filter, options)
+
+        // Creating links to prev and next pages
+        const queryLink = query ? `&query=${query}` : ""
+        const limitLink = limit ? `&limit=${limit}` : ""
+        const sortLink = sort ? `&sort=${sort}` : ""
+        const prevPageLink = products.hasPrevPage ? `/api/products?page=${products.prevPage}${limitLink}${queryLink}${sortLink}` : null
+        const nextPageLink = products.hasNextPage ? `/api/products?page=${products.nextPage}${limitLink}${queryLink}${sortLink}` : null
+
+        const response = {
+            status: "success",
+            payload: products.docs,
+            totalPages: products.totalPages,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+            page: products.page,
+            hasPrevPage: products.hasPrevPage,
+            hasNextPage: products.hasNextPage,
+            prevLink: prevPageLink,
+            nextLink: nextPageLink
+        }
+
+        res.send({ response })
+    } catch (error) {
+        res.send({ status: "error", error: error })
+    }
 });
 
 routerProduct.get("/:pid", async (req, res) => {
-    if (selectedDB == 1) {
-        // MongoDB
-        const product = await manager.getElementById(req.params.pid)
-        res.send({ response: product })
-    } else {
-        // SQL not implemented
-    }
+    const product = await manager.getElementById(req.params.pid)
+    res.send({ product })
+
 });
 
 routerProduct.post('/', async (req, res) => {
-    if (selectedDB == 1) {
-        // MongoDB
-        const { title, description, code, price, status, stock, category, thumbnails } = req.body
-        try {
-            const data = await manager.addElements({
-                title: title,
-                description: description,
-                code: code,
-                price: price,
-                status: status,
-                stock: parseInt(stock),
-                category: category,
-                thumbnails: thumbnails
-            })
-            console.log(data)
-            res.send({ response: data })
-        } catch (error) {
-            res.send({ response: error })
-            console.log(error)
-        }
-    } else {
-        // SQL not implemented
+    try {
+        const info = req.body
+        const data = await manager.addElements(info)
+        console.log(data)
+        res.send({ data })
+    } catch (error) {
+        res.send({ error })
+        console.log(error)
     }
-
 })
 
 routerProduct.put('/:pid', async (req, res) => {
     try {
-        if (selectedDB == 1) {
-            // MongoDB
-            const data = await manager.updateElement(req.params.pid, req.body)
-            res.send({ response: data })
-        } else {
-            // SQL not implemented
-        }
+        const data = await manager.updateElement(req.params.pid, req.body)
+        res.send({ response: data })
     } catch (error) {
         res.send({ response: error })
     }
@@ -124,13 +90,11 @@ routerProduct.put('/:pid', async (req, res) => {
 
 routerProduct.delete('/:pid', async (req, res) => {
     try {
-        if (selectedDB == 1) {
-            // MongoDB
-            const data = await manager.deleteElement(req.params.pid)
-            res.send({ response: data })
-        } else {
-            // SQL not implemented
-        }
+
+        // MongoDB
+        const data = await manager.deleteElement(req.params.pid)
+        res.send({ response: data })
+
 
     } catch (error) {
         res.send({ response: error })

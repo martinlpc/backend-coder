@@ -1,27 +1,23 @@
 import { Router } from 'express'
-//import ProductManager from '../controllers/ProductManager.js';
-import { getManagerMessages, getManagerProducts } from '../dao/daoManager.js';
+import { getManagerProducts } from '../dao/daoManager.js';
+//import { managerMessages } from '../index.js';
 
 const routerSocket = Router()
 const selectedDB = process.env.DBSELECTION
+
 const prodManagerData = await getManagerProducts()
 const prodManager = new prodManagerData()
-
-const msgManagerData = await getManagerMessages()
-const msgManager = new msgManagerData()
+// const msgManagerData = await getManagerMessages()
+// const msgManager = new msgManagerData()
 
 routerSocket.get('/', async (req, res) => {
     let { limit } = req.query;
-    if (selectedDB == 1) {
-        // MongoDB
-        let products
-        !limit
-            ? products = await prodManager.getElements(0)
-            : products = await prodManager.getElements(limit)
-        res.render("home", { products })
-    } else {
-        // SQL not implemented
-    }
+
+    let products
+    !limit
+        ? products = await prodManager.getElements(0)
+        : products = await prodManager.getElements(limit)
+    res.render("home", { products })
 
     // const products = await manager.getProducts();
     // let { limit } = req.query;
@@ -36,12 +32,15 @@ routerSocket.get('/', async (req, res) => {
 
 routerSocket.get("/realtimeproducts", async (req, res) => {
 
-    if (selectedDB == 1) {
+    try {
+
         const products = await prodManager.getElements(0)
+        console.log(products)
         res.render("realTimeProducts", { products: products })
-    } else {
-        console.log("SQL not implemented")
+    } catch (error) {
+        console.log(error)
     }
+
 
     // const products = await manager.getProducts()
 
@@ -50,10 +49,10 @@ routerSocket.get("/realtimeproducts", async (req, res) => {
     // })
 })
 
-routerSocket.get("/chat", async (req, res) => {
-    const messages = await msgManager.getElements(0)
-    res.render("chat", { messages: messages })
+// routerSocket.get("/chat", async (req, res) => {
+//     const messages = await managerMessages.getElements(0)
+//     res.render("chat", { messages: messages })
 
-})
+// })
 
 export default routerSocket
