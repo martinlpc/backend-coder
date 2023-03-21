@@ -3,12 +3,14 @@ import 'dotenv/config'
 import routerProduct from "./routes/products.routes.js";
 import routerCart from "./routes/carts.routes.js";
 import routerSocket from "./routes/socket.routes.js";
+import routerViews from './routes/views.routes.js';
 import express from 'express'
 import { engine } from 'express-handlebars'
 import { Server } from 'socket.io'
 import { getManagerMessages } from './dao/daoManager.js'
 import { __dirname } from "./path.js";
 import * as path from 'path'
+
 
 const app = express()
 
@@ -59,3 +61,4 @@ app.use('/api/products', routerProduct)
 app.use('/api/carts', routerCart)
 app.use('/realtimeproducts', routerSocket)
 app.use('/chat', routerSocket)
+app.use('/products', routerViews)

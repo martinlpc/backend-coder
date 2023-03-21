@@ -1,84 +1,140 @@
 import { Router } from 'express'
-import { getManagerCarts, getManagerProducts } from '../dao/daoManager.js'
-import mongoose from "mongoose"
-
+import { getManagerCarts } from '../dao/daoManager.js'
 
 const routerCart = Router()
 
 const cartManagerData = await getManagerCarts()
 const cartManager = new cartManagerData()
-const prodManagerData = await getManagerProducts()
-const prodManager = new prodManagerData()
 
 routerCart.get('/:cid', async (req, res) => {
-    const cart = await cartManager.getElementById(req.params.cid)
-    const popCart = await cart.populate({ path: 'products.productId', model: cartManager.productModel })
-    res.send({ popCart })
-})
-routerCart.post('/:cid/product/:pid', async (req, res) => {
-    // const cartSchema = new Schema({
-    //     products: {
-    //         type: Array,
-    //         required: true
-    //     }
-
-    // })
-    // const cart = mongoose.model("Cart", cartSchema)
-
-    // const productQty = 1 // Hardcoded by now 
-
-    // try {
-    //     const productInfo = await prodManager.getElementById(req.params.pid)
-    //     if (productInfo) {
-    //         const dataToWrite = new cart({
-    //             products: [
-    //                 { id: req.params.pid, quantity: productQty }
-    //             ]
-    //         })
-    //         const response = await cartManager.addElements(dataToWrite)
-
-    //         res.send(`Product with id: "${req.params.pid}" added to cart`)
-    //     } else {
-    //         res.send(`The id: "${req.params.pid}" was not found`)
-    //     }
-    // } catch (error) {
-    //     res.send("Error accessing to the database")
-    // }
     try {
+        const cart = await cartManager.getElementById(req.params.cid)
+        const popCart = await cart.populate({ path: 'products.productId', model: cartManager.productModel })
 
+        res.send({
+            status: "success",
+            payload: popCart
+        })
     } catch (error) {
-
+        res.send({
+            status: "error",
+            payload: error
+        })
     }
 })
 
+// * Create a new empty cart
 routerCart.post('/', async (req, res) => {
-    // const data = await cartManager.createCart()
-    // data ? res.send(`Cart created with id ${data}`) : res.send("Error on creating cart")
     try {
-        const data = await cartManager.addElements({ products: [] })
-        res.send({ data })
+        const newCart = {}
+        const data = await cartManager.addElements(newCart)
+
+        res.send({
+            status: "success",
+            payload: data
+        })
         console.log(data)
     } catch (error) {
-        res.send({ error })
+        res.send({
+            status: "error",
+            payload: error
+        })
         console.log(error)
     }
 })
 
+// * Add a single product to a specified cart
+routerCart.post('/:cid/product/:pid', async (req, res) => {
+    try {
+        const data = await cartManager.addProduct(req.params.cid, req.params.pid, 1)
+
+        res.send({
+            status: "success",
+            payload: data
+        })
+
+    } catch (error) {
+        res.send({
+            status: "error",
+            payload: error
+        })
+    }
+})
+
+// * Replace all products with an array via req.body
 routerCart.put('/:cid', async (req, res) => {
+    try {
+        const productsToAdd = req.body
+
+        const response = await cartManager.replaceAllProducts(req.params.cid, productsToAdd)
+
+        res.send({
+            status: "success",
+            payload: response
+        })
+    } catch (error) {
+        res.send({
+            status: "error",
+            payload: error
+        })
+    }
+})
+
+// * Change quantity of a single product in a specified cart
+routerCart.put('/:cid/product/:pid', async (req, res) => {
+    try {
+        const { quantity } = req.body
+        const newQuantity = parseInt(quantity)
+
+        const updatedProduct = await cartManager.changeQuantity(req.params.cid, req.params.pid, newQuantity)
+
+        res.send({
+            status: "success",
+            payload: updatedProduct
+        })
+
+    } catch (error) {
+        res.send({
+            status: "error",
+            payload: error
+        })
+    }
 
 })
 
-routerCart.put('/:cid/products/:pid', async (req, res) => {
-
-})
-
+// * Remove an entire product from the cart 
 routerCart.delete('/:cid/product/:pid', async (req, res) => {
-    // const data = await cartManager.removeProductById(parseInt(req.params.cid), parseInt(req.params.pid))
-    // res.send(data)
+    try {
+        const cart = await cartManager.removeProduct(req.params.cid, req.params.pid)
+
+        res.send({
+            status: "success",
+            payload: cart
+        })
+    } catch (error) {
+        res.send({
+            status: "error",
+            payload: error
+        })
+
+    }
 })
 
+// * Remove all products (empty) from the cart
 routerCart.delete('/:cid', async (req, res) => {
     // Empty selected cart
+    try {
+        const cart = await cartManager.emptyCart(req.params.cid)
+        res.send({
+            status: "success",
+            payload: cart
+        })
+    } catch (error) {
+        res.send({
+            status: "error",
+            payload: error
+        })
+    }
 })
 
 export default routerCart

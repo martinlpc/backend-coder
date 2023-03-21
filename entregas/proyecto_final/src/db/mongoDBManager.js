@@ -73,12 +73,5 @@ export class ManagerMongoDB {
         }
     }
 
-    async paginate(filter, options) {
-        this._setConnection()
-        try {
-            return await this.model.paginate(filter, options)
-        } catch (error) {
-            return error
-        }
-    }
+
 }

@@ -1,5 +1,5 @@
 import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
-import { Schema, model } from "mongoose";
+import { Schema } from "mongoose";
 import mongoosePaginate from 'mongoose-paginate-v2'
 
 const url = process.env.URLMONGODB
@@ -46,8 +46,15 @@ class ManagerProductsMongoDB extends ManagerMongoDB {
     constructor() {
         super(url, "products", productSchema)
     }
-    // * Cuando se puedan hacer los atributos y metodos protected
-    // * traer acá los métodos específicos para model product
+
+    async paginate(filter, options) {
+        this._setConnection()
+        try {
+            return await this.model.paginate(filter, options)
+        } catch (error) {
+            return error
+        }
+    }
 }
 
 // Exporting an instance of the class ready to use
