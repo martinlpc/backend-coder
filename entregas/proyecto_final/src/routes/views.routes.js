@@ -6,37 +6,54 @@ const routerViews = Router()
 const PRODUCTS_URL = 'http://localhost:8080/api/products'
 const CARTS_URL = 'http://localhost:8080/api/carts'
 
-const managerData = await getManagerProducts()
-const manager = new managerData()
+// const managerData = await getManagerProducts()
+// const manager = new managerData()
 
 routerViews.get('/products', async (req, res) => {
+    try {
+        let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
 
-    const response = await fetch(PRODUCTS_URL)
-    const data = await response.json()
+        // Creating links to prev and next pages
+        const categoryLink = category ? `&category=${category}` : ""
+        const stockLink = stock ? `&stock=${stock}` : ""
+        const limitLink = limit ? `&limit=${limit}` : ""
+        const sortLink = sort ? `&sort=${sort}` : ""
+        const pageLink = page ? `&page=${page}` : ""
 
-    const { status, payload, totalPages, prevPage, nextPage, page, hasPrevPage, hasNextPage, prevLink, nextLink } = data
+        const response = await fetch(`${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
+        const data = await response.json()
 
-    res.render('products', {
-        status,
-        payload,
-        totalPages,
-        prevPage,
-        nextPage,
-        page,
-        hasPrevPage,
-        hasNextPage,
-        prevLink,
-        nextLink
-    })
+        const { status, payload, totalPages, prevPage, nextPage, actualPage, hasPrevPage, hasNextPage, prevLink, nextLink } = data
+
+        let statusBool = status === "success" ? true : false
+
+        res.render('products', {
+            statusBool,
+            payload,
+            totalPages,
+            prevPage,
+            nextPage,
+            actualPage,
+            hasPrevPage,
+            hasNextPage,
+            prevLink,
+            nextLink
+        })
+        console.log(status)
+    } catch (error) {
+        res.render('products', {
+            status: "error",
+            payload: error
+        })
+        console.log(error)
+    }
 })
 
 routerViews.get('/carts/:cid', async (req, res) => {
     const response = await fetch(`${CARTS_URL}/${req.params.cid}`)
     const data = await response.json()
-    console.log(data)
 
     const { status, payload } = data
-    console.log("pl:", payload.products)
 
     let products = []
     for (const item of payload.products) {
@@ -50,7 +67,8 @@ routerViews.get('/carts/:cid', async (req, res) => {
 
     res.render('carts', {
         status,
-        products
+        products,
+        cartID: req.params.cid
     })
 
 })

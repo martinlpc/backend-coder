@@ -29,21 +29,24 @@ class ManagerCartMongoDB extends ManagerMongoDB {
 
     async changeQuantity(cartID, productID, newQuantity) {
         await this._setConnection()
+        try {
+            // Get cart
+            const cart = await this.model.findById(cartID)
 
-        // Get cart
-        const cart = await this.model.findById(cartID)
+            // Check product existance and get its index
+            const productIndex = cart.products.findIndex(product => product.productId.equals(productID))
+            if (productIndex === -1) throw new Error("Product not found in the specified cart")
 
-        // Check product existance and get its index
-        const productIndex = cart.products.findIndex(product => product.productId.equals(productID))
-        if (productIndex === -1) throw new Error("Product not found in the specified cart")
+            // Update/change product quantity
+            cart.products[productIndex].quantity = newQuantity
 
-        // Update/change product quantity
-        cart.products[productIndex].quantity = newQuantity
+            // Save updated doc
+            await cart.save()
 
-        // Save updated doc
-        await cart.save()
-
-        return cart.products[productIndex]
+            return cart.products[productIndex]
+        } catch (error) {
+            return error
+        }
     }
 
     async removeProduct(cartID, productID) {
@@ -62,19 +65,24 @@ class ManagerCartMongoDB extends ManagerMongoDB {
         // Save updated doc
         await cart.save()
 
-        return cart.products
+        return cart
     }
 
     async addProduct(cartID, productID, quantity) {
         this._setConnection()
         try {
+            // Get the cart
             const cart = await this.model.findById(cartID)
-            cart.products.push({
-                productId: productID,
-                quantity: quantity
-            })
+
+            // Check if the product is already into the cart
+            const productIndex = cart.products.findIndex(product => product.productId.equals(productID))
+            productIndex === -1
+                ? cart.products.push({ productId: productID, quantity: quantity }) // Add new product
+                : cart.products[productIndex].quantity += quantity // Increase product quantity
+
             await cart.save()
-            return cart.products
+
+            return cart
         } catch (error) {
             return error
         }
@@ -86,7 +94,7 @@ class ManagerCartMongoDB extends ManagerMongoDB {
             const cart = await this.model.findById(cartID)
             cart.products = productsToAdd
             await cart.save()
-            return cart.products
+            return cart
         } catch (error) {
             return error
         }

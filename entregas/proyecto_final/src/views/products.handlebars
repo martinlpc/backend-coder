@@ -1,7 +1,35 @@
-{{#each payload}}
-    <div class="product">
-        <h2>{{title}}</h2>
-        <p>{{description}}</p>
-        <span>{{price}}</span>
+<h1>Productos en venta</h1>
+<div class="container-categories">
+    <span>Categorías: </span>
+    <a href="?">Todo</a>
+    <a href="?category=Juguetes">Juguetes</a>
+    <a href="?category=Accesorios">Accesorios</a>
+    <a href="?category=Alimento">Alimento</a>
+    <a href="?category=Sanitarios">Sanitarios</a>
+</div>
+<div class="container-pages">
+
+</div>
+
+{{#if statusBool}}
+    {{#each payload}}
+        <div class="product">
+            <h2>{{title}}</h2>
+            <p>{{description}}</p>
+            <span>Precio: $ {{price}}</span>
+        </div>
+    {{/each}}
+
+    {{#if hasPrevPage}}
+        <a href="">PAG ANTERIOR</a>
+    {{/if}}
+    {{#if hasNextPage}}
+        <a href="">PAG ANTERIOR</a>
+    {{/if}}
+{{else}}
+    <div>
+        <h2>No se encontraron productos</h2>
     </div>
-{{/each}}
+{{/if}}
+
+<script src="/js/products.js"></script>
