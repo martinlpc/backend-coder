@@ -3,11 +3,56 @@ import { getManagerProducts } from "../dao/daoManager.js";
 
 const routerViews = Router()
 
+const PRODUCTS_URL = 'http://localhost:8080/api/products'
+const CARTS_URL = 'http://localhost:8080/api/carts'
+
 const managerData = await getManagerProducts()
 const manager = new managerData()
 
-routerViews.get('/', async (req, res) => {
-    // TODO: implementar la vista de productos paginados
+routerViews.get('/products', async (req, res) => {
+
+    const response = await fetch(PRODUCTS_URL)
+    const data = await response.json()
+
+    const { status, payload, totalPages, prevPage, nextPage, page, hasPrevPage, hasNextPage, prevLink, nextLink } = data
+
+    res.render('products', {
+        status,
+        payload,
+        totalPages,
+        prevPage,
+        nextPage,
+        page,
+        hasPrevPage,
+        hasNextPage,
+        prevLink,
+        nextLink
+    })
+})
+
+routerViews.get('/carts/:cid', async (req, res) => {
+    const response = await fetch(`${CARTS_URL}/${req.params.cid}`)
+    const data = await response.json()
+    console.log(data)
+
+    const { status, payload } = data
+    console.log("pl:", payload.products)
+
+    let products = []
+    for (const item of payload.products) {
+        products.push({
+            title: item.productId.title,
+            description: item.productId.description,
+            price: item.productId.price,
+            quantity: item.quantity
+        })
+    }
+
+    res.render('carts', {
+        status,
+        products
+    })
+
 })
 
 export default routerViews
