@@ -5,7 +5,7 @@
  
 ### Alumno: Martín Pacheco
 
-El contenido referido al proyecto final se ubica en la ruta "/entregas/proyecto_final"
+El contenido referido al proyecto final se ubica en la ruta [/entregas/proyecto_final](https://github.com/martinlpc/backend-coder/tree/master/entregas/proyecto_final)
   
 ## Brief
 
