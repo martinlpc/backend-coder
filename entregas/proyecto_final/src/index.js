@@ -4,19 +4,33 @@ import routerProduct from "./routes/products.routes.js";
 import routerCart from "./routes/carts.routes.js";
 import routerSocket from "./routes/socket.routes.js";
 import routerViews from './routes/views.routes.js';
+import routerSession from './routes/sessions.routes.js';
 import express from 'express'
 import { engine } from 'express-handlebars'
 import { Server } from 'socket.io'
 import { getManagerMessages } from './dao/daoManager.js'
 import { __dirname } from "./path.js";
 import * as path from 'path'
-
+import MongoStore from 'connect-mongo'
+import cookieParser from 'cookie-parser'
+import session from 'express-session';
 
 const app = express()
 
 // Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser(process.env.COOKIE_SECRET))
+// app.use(session({
+//     store: MongoStore.create({
+//         mongoUrl: process.env.MONGODBURL,
+//         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+//         ttl: 90
+//     }),
+//     secret: process.env.SESSION_SECRET,
+//     resave: true,
+//     saveUninitialized: true
+// }))
 
 // Handlebars as template engine
 app.engine('handlebars', engine());
@@ -59,6 +73,7 @@ app.use('/', express.static(__dirname + '/public'))
 app.use('/', routerSocket)
 app.use('/api/products', routerProduct)
 app.use('/api/carts', routerCart)
-app.use('/realtimeproducts', routerSocket)
+//app.use('/realtimeproducts', routerSocket)
 app.use('/chat', routerSocket)
 app.use('/', routerViews)
+app.use('/api/session', routerSession)

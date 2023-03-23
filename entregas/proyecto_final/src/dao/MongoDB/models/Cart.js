@@ -1,10 +1,8 @@
 import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
-import mongoose, { Schema } from "mongoose";
+import { Schema } from "mongoose";
 import ManagerProductsMongoDB from "./Product.js";
 
-const url = process.env.URLMONGODB
-
-const cartSchema = new mongoose.Schema({
+const cartSchema = new Schema({
     products: {
         type: [{
             productId: {
@@ -23,12 +21,12 @@ const cartSchema = new mongoose.Schema({
 
 class ManagerCartMongoDB extends ManagerMongoDB {
     constructor() {
-        super(url, "carts", cartSchema)
+        super(process.env.URLMONGODB, "carts", cartSchema)
         this.productModel = ManagerProductsMongoDB.model
     }
 
     async changeQuantity(cartID, productID, newQuantity) {
-        await this._setConnection()
+        await super._setConnection()
         try {
             // Get cart
             const cart = await this.model.findById(cartID)
@@ -50,7 +48,7 @@ class ManagerCartMongoDB extends ManagerMongoDB {
     }
 
     async removeProduct(cartID, productID) {
-        await this._setConnection()
+        await super._setConnection()
 
         // Get cart
         const cart = await this.model.findById(cartID)
@@ -69,7 +67,7 @@ class ManagerCartMongoDB extends ManagerMongoDB {
     }
 
     async addProduct(cartID, productID, quantity) {
-        this._setConnection()
+        super._setConnection()
         try {
             // Get the cart
             const cart = await this.model.findById(cartID)
@@ -89,7 +87,7 @@ class ManagerCartMongoDB extends ManagerMongoDB {
     }
 
     async replaceAllProducts(cartID, productsToAdd) {
-        this._setConnection()
+        super._setConnection()
         try {
             const cart = await this.model.findById(cartID)
             cart.products = productsToAdd
@@ -101,7 +99,7 @@ class ManagerCartMongoDB extends ManagerMongoDB {
     }
 
     async emptyCart(cartID) {
-        this._setConnection()
+        super._setConnection()
         try {
             const cart = await this.model.findById(cartID)
             cart.products = []

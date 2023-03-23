@@ -2,8 +2,6 @@ import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
 import { Schema } from "mongoose";
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-const url = process.env.URLMONGODB
-
 const productSchema = new Schema({
     title: {
         type: String,
@@ -44,11 +42,11 @@ productSchema.plugin(mongoosePaginate)
 
 class ManagerProductsMongoDB extends ManagerMongoDB {
     constructor() {
-        super(url, "products", productSchema)
+        super(process.env.URLMONGODB, "products", productSchema)
     }
 
     async paginate(filter, options) {
-        this._setConnection()
+        super._setConnection()
         try {
             return await this.model.paginate(filter, options)
         } catch (error) {
