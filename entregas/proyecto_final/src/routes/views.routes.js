@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { getManagerProducts } from "../dao/daoManager.js";
 
 const routerViews = Router()
 
@@ -50,26 +49,34 @@ routerViews.get('/products', async (req, res) => {
 })
 
 routerViews.get('/carts/:cid', async (req, res) => {
-    const response = await fetch(`${CARTS_URL}/${req.params.cid}`)
-    const data = await response.json()
+    try {
 
-    const { status, payload } = data
+        const response = await fetch(`${CARTS_URL}/${req.params.cid}`)
+        const data = await response.json()
 
-    let products = []
-    for (const item of payload.products) {
-        products.push({
-            title: item.productId.title,
-            description: item.productId.description,
-            price: item.productId.price,
-            quantity: item.quantity
+        const { status, payload } = data
+
+        let products = []
+        for (const item of payload.products) {
+            products.push({
+                title: item.productId.title,
+                description: item.productId.description,
+                price: item.productId.price,
+                quantity: item.quantity
+            })
+        }
+
+        res.render('carts', {
+            status,
+            products,
+            cartID: req.params.cid
+        })
+    } catch (error) {
+        res.render('carts', {
+            status: "error",
+            message: "Cart not found"
         })
     }
-
-    res.render('carts', {
-        status,
-        products,
-        cartID: req.params.cid
-    })
 
 })
 

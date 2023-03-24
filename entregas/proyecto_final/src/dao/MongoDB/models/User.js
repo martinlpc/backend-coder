@@ -1,8 +1,12 @@
-import { ManagerMongoDB } from "../../../db/mongoDBManager.js";
+import { ManagerMongoDB } from "../db/mongoDBManager.js";
 import { Schema } from "mongoose";
 
 const userSchema = new Schema({
-    name: {
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
         type: String,
         required: true
     },
@@ -18,6 +22,10 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        default: "user"
     },
     createdAt: {
         type: Date,
