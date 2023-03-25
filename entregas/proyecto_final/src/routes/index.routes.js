@@ -8,12 +8,12 @@ import routerUser from "./users.routes.js";
 
 const router = Router()
 
-router.use('/', routerSocket)
+//router.use('/', routerSocket)
 router.use('/', routerViews)
 router.use('/api/products', routerProduct)
 router.use('/api/carts', routerCart)
 router.use('/api/session', routerSession)
-router.use('/realtimeproducts', routerSocket)
+//router.use('/realtimeproducts', routerSocket)
 router.use('/chat', routerSocket)
 router.use('/user', routerUser)
 

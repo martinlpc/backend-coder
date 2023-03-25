@@ -3,7 +3,6 @@ import { getManagerProducts } from '../dao/daoManager.js';
 //import { managerMessages } from '../index.js';
 
 const routerSocket = Router()
-const selectedDB = process.env.DBSELECTION
 
 const prodManagerData = await getManagerProducts()
 const prodManager = new prodManagerData()
