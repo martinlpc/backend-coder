@@ -98,12 +98,12 @@ const initializePassport = () => {
                 done(null, user)
             } else {
                 console.log("nuevo user desde github")
-                const hashPassword = createHash('coder123')
+                //const hashPassword = createHash('')
                 const createdUser = await userManager.addElements({
                     first_name: profile._json.name,
                     last_name: ' ',
                     email: profile._json.email,
-                    password: hashPassword, //pass por default ya que no se puede acceder al pass de github
+                    password: ' ', // Default password required by Challenge #5
                     role: "user"
                 })
 
