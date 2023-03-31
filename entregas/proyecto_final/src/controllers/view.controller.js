@@ -17,7 +17,6 @@ export const viewRegister = (req, res) => {
 
 export const viewCarts = async (req, res) => {
     try {
-
         const response = await fetch(`${CARTS_URL}/${req.params.cid}`)
         const data = await response.json()
 
@@ -50,6 +49,12 @@ export const renderProducts = async (req, res) => {
     try {
         let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
 
+        // Get session data prior to continue
+        // const sessionData = getSession(req, res)
+        // console.log("viewctrlr> sessionData:", sessionData)
+        // const userFirst = sessionData.name
+        // const userRole = sessionData.role
+
         // Creating links to prev and next pages
         const categoryLink = category ? `&category=${category}` : ""
         const stockLink = stock ? `&stock=${stock}` : ""
@@ -64,13 +69,6 @@ export const renderProducts = async (req, res) => {
 
         let statusBool = status === "success" ? true : false
 
-        // Getting session data
-
-        const sessionData = await getSession(req, res)
-        console.log({ sessionData })
-        const userFirst = sessionData.name
-        const userRole = sessionData.role
-
         res.render('products', {
             statusBool,
             payload,
@@ -81,9 +79,9 @@ export const renderProducts = async (req, res) => {
             hasPrevPage,
             hasNextPage,
             prevLink,
-            nextLink,
-            userFirst,
-            userRole
+            nextLink
+            //userFirst,
+            //userRole
         })
     } catch (error) {
         res.render('products', {

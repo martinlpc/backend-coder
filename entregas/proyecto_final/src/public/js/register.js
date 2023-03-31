@@ -15,7 +15,7 @@ form.addEventListener('submit', event => {
         body: new URLSearchParams(formData).toString()
     }
 
-    fetch('/user', options)
+    fetch('/user/register', options)
         .then(response => {
             if (response.ok) {
                 window.location.href = '/login'

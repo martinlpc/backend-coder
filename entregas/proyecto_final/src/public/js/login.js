@@ -9,24 +9,17 @@ form.addEventListener('submit', event => {
         data[key] = value
     }
 
-    // const options = {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(data)
-    // }
-
-    // fetch('/api/session/login', options)
-    //     .then(response => response.json())
-    //     .then(data => console.log(data))
-
     const options = {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(formData).toString()
     }
 
+    console.log("opt:", options)
+
     fetch('/api/session/login', options)
         .then(response => {
+            console.log("resp:", response)
             if (response.ok) {
                 window.location.href = '/products';
             } else {
@@ -34,3 +27,5 @@ form.addEventListener('submit', event => {
             }
         })
 })
+
+

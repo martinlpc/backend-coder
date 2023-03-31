@@ -1,5 +1,5 @@
 <h1>Productos en venta</h1>
-<div class="container-user-actions">
+<div class="container container-user-actions">
 
     <p>Bienvenidx <b>{{userFirst}}</b></p>
     <p>Rol: <b>{{userRole}}</b></p>
@@ -7,7 +7,7 @@
 
 </div>
 
-<div class="container-categories">
+<div class="container container-categories">
     <span>Categorías: </span>
     <a href="?">Todo</a>
     <a href="?category=Juguetes">Juguetes</a>
@@ -16,7 +16,7 @@
     <a href="?category=Sanitarios">Sanitarios</a>
 </div>
 {{#if statusBool}}
-    <div class="container-pages">
+    <div class="container container-pages">
 
         {{#if hasPrevPage}}
             <a href="">PAG ANTERIOR</a>
@@ -28,13 +28,24 @@
 {{/if}}
 
 {{#if statusBool}}
-    {{#each payload}}
-        <div class="product">
-            <h2>{{title}}</h2>
-            <p>{{description}}</p>
-            <span>Precio: $ {{price}}</span>
+    <div class="container">
+        <div class="row">
+            {{#each payload}}
+                <div class="col-4 card product">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            {{title}}
+                        </h2>
+                        <div class="card-text">
+                            <p>{{description}}</p>
+                            <span>Precio: $ {{price}}</span>
+                        </div>
+                    </div>
+
+                </div>
+            {{/each}}
         </div>
-    {{/each}}
+    </div>
 
 {{else}}
     <div>

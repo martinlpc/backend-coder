@@ -1,4 +1,4 @@
-html{
+body{
     background-color:hsla(236,68%,60%,1);
     background-image:
         radial-gradient(at 13% 91%, hsla(236,68%,60%,1) 0px, transparent 50%),
@@ -8,10 +8,30 @@ html{
     color: rgb(4, 43, 43);
 }
 
+h1{
+    margin: 10px;
+}
+
 #form-login > *{
     font-weight: 400;
 }
 
+.container-login-view{
+    margin: 20px;
+}
+
+.message-error-login{
+
+    color: rgb(165, 4, 4);
+}
+.hidden{
+    display: none;
+}
+
 .container-categories{
     padding: top 20px;
+}
+
+a{
+    color: whitesmoke
 }

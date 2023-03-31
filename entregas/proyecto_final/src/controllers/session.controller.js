@@ -1,12 +1,12 @@
 import { userManager } from "./user.controller.js"
 import { validatePassword } from "../utils/bcrypt.js"
 
-export const getSession = async (req, res) => {
+export const getSession = (req, res) => {
     try {
         if (req.session.login) {
             const sessionData = {
-                name: req.session.userFirst,
-                role: req.session.role
+                name: req.session.user.first_name,
+                role: req.session.user.role
             }
             return sessionData
         } else {
@@ -26,18 +26,19 @@ export const checkLogin = async (req, res) => {
 
         if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
             req.session.login = true
-            req.session.userFirst = "Admin Coder"
-            req.session.role = "admin"
-            console.log(`${email} logged in`)
+            req.session.user.first_name = "Admin Coder"
+            req.session.user.role = "admin"
+            console.log(`sessionctrler> ${email} logged in`)
             res.redirect('/products')
         } else {
             const user = await userManager.getUserByEmail(email)
 
             if (user && validatePassword(password, user.password)) {
+                console.log("sessionctrler> pass valid")
                 req.session.login = true
-                req.session.userFirst = user.first_name
-                req.session.role = user.role
-                console.log(`${email} logged in as ${user.role}`)
+                //req.session.user.first_name = user.first_name
+                // req.session.user.role = user.role
+                console.log(`sessionctrler> ${email} logged in as ${user.role}`)
                 res.redirect('/products')
             } else {
                 res.status(401).json({
@@ -67,7 +68,7 @@ export const destroySession = (req, res) => {
 }
 
 export const requireAuth = (req, res, next) => {
-    console.log(req.session.login)
+    console.log("sessionctrlr> session logged: ", req.session.login)
     req.session.login ? next() : res.redirect('/login')
 
 }
