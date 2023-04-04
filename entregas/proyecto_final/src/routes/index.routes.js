@@ -10,13 +10,19 @@ import routerGithub from "./github.routes.js";
 const router = Router()
 
 //router.use('/', routerSocket)
-router.use('/', routerViews)
-router.use('/api/products', routerProduct)
-router.use('/api/carts', routerCart)
-router.use('/api/session', routerSession)
-router.use('/authSession', routerGithub)
 //router.use('/realtimeproducts', routerSocket)
+router.use('/', routerViews)
+
+router.use('/api/products', routerProduct)
+
+router.use('/api/carts', routerCart)
+
+router.use('/api/session', routerSession)
+
+router.use('/authSession', routerGithub)
+
 router.use('/chat', routerSocket)
+
 router.use('/user', routerUser)
 
 export default router

@@ -15,16 +15,13 @@ form.addEventListener("submit", (event) => {
         body: new URLSearchParams(formData).toString(),
     };
 
-    console.log("opt:", options);
-
-    fetch("/api/session/login", options) // * If valid, backend will redirect to /products
-        .then((response) => console.log("resp: ", response));
-    // .then(response => {
-    //     console.log("resp:", response)
-    //     if (response.ok) {
-    //         window.location.href = '/products';
-    //     } else {
-    //         alert("Datos incorrectos")
-    //     }
-    // })
+    fetch("/api/session/login", options)
+        .then(response => {
+            console.log("resp:", response)
+            if (response.ok) {
+                window.location.href = '/products';
+            } else {
+                alert("Datos incorrectos")
+            }
+        })
 });

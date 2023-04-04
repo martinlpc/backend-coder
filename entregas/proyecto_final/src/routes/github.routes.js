@@ -7,14 +7,24 @@ const routerGithub = Router()
 routerGithub.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => { })
 
 // Login
-routerGithub.get('/githubSession', passport.authenticate('github'), async (req, res) => {
-    req.session.user = req.user
-    if (req.session.user) {
+routerGithub.get('/githubSession', (req, res, next) => {
+    passport.authenticate('github', async (error, user) => {
+        if (error) {
+            req.session.message = "An error ocurred"
+            res.redirect('/login')
+        }
+        if (!user) {
+            req.session.message = "Unable to verify user"
+            res.redirect('/login')
+        }
+
         req.session.login = true
+        req.session.name = user.first_name
+        req.session.role = user.role
+
         res.redirect('/products')
-    } else {
-        res.redirect('/login')
-    }
+
+    })(req, res, next)
 })
 
 export default routerGithub

@@ -37,8 +37,7 @@ const initializePassport = () => {
         )
     );
 
-    passport.use(
-        "register",
+    passport.use("register",
         new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, username, password, done) => {
             const { first_name, last_name, email } = req.body;
 
@@ -66,11 +65,10 @@ const initializePassport = () => {
         })
     );
 
-    passport.use(
-        "login",
+    passport.use("login",
         new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
             try {
-                // ! CHEQUEAR ESTA SECCION
+                // ! CHEQUEAR ESTA SECCION DE ADMIN
                 // if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
                 //     const user = {
                 //         _id: new mongoose.Types.ObjectId(),
@@ -104,40 +102,38 @@ const initializePassport = () => {
         })
     );
 
-    passport.use(
-        "github",
-        new GitHubStrategy(
-            {
-                clientID: process.env.CLIENT_ID,
-                clientSecret: process.env.CLIENT_SECRET,
-                callbackURL: "http://localhost:8080/authSession/githubSession",
-            },
-            async (accessToken, refreshToken, profile, done) => {
-                try {
-                    console.log(profile);
-                    const user = await userManager.getUserByEmail(profile._json.email);
+    passport.use("github", new GitHubStrategy(
+        {
+            clientID: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
+            callbackURL: "http://localhost:8080/authSession/githubSession",
+        },
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                console.log(profile);
+                const user = await userManager.getUserByEmail(profile._json.email);
 
-                    if (user) {
-                        console.log("encontró user existente en github");
-                        done(null, user);
-                    } else {
-                        console.log("nuevo user desde github");
-                        //const hashPassword = createHash('')
-                        const createdUser = await userManager.addElements({
-                            first_name: profile._json.name,
-                            last_name: " ",
-                            email: profile._json.email,
-                            password: " ", // Default password required by Challenge #5
-                            role: "user",
-                        });
+                if (user) {
+                    console.log("encontró user existente en github");
+                    done(null, user);
+                } else {
+                    console.log("nuevo user desde github");
+                    //const hashPassword = createHash('')
+                    const createdUser = await userManager.addElements({
+                        first_name: profile._json.name,
+                        last_name: " ",
+                        email: profile._json.email,
+                        password: " ", // Default password required by Challenge #5
+                        role: "user",
+                    });
 
-                        done(null, createdUser);
-                    }
-                } catch (error) {
-                    return done(error);
+                    done(null, createdUser);
                 }
+            } catch (error) {
+                return done(error);
             }
-        )
+        }
+    )
     );
 
     // Iniciar sesión

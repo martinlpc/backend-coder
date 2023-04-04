@@ -1,4 +1,17 @@
+
 const form = document.querySelector('#form-register')
+const password = document.getElementById('password')
+const checkShowPassword = document.getElementById('show-password')
+
+console.log('password', password);
+console.log('checkShowPassword', checkShowPassword);
+
+checkShowPassword.addEventListener('change', () => {
+    checkShowPassword.checked
+        ? password.type = "text"
+        : password.type = "password"
+
+})
 
 form.addEventListener('submit', event => {
     event.preventDefault()

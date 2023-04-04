@@ -3,16 +3,20 @@ import { getSession } from "./session.controller.js";
 const PRODUCTS_URL = "http://localhost:8080/api/products";
 const CARTS_URL = "http://localhost:8080/api/carts";
 
-export const viewProducts = (req, res) => {
-    res.redirect("/products");
-};
+// export const viewProducts = (req, res) => {
+//     res.redirect("/products");
+// };
 
 export const viewLogin = (req, res) => {
-    res.render("login");
+    const message = req.session.message
+    delete req.session.message
+    res.render("login", { message });
 };
 
 export const viewRegister = (req, res) => {
-    res.render("register");
+    const message = req.session.message
+    delete req.session.message
+    res.render("register", { message });
 };
 
 export const viewCarts = async (req, res) => {
@@ -50,10 +54,8 @@ export const renderProducts = async (req, res) => {
         let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
 
         // Get session data prior to continue
-        // const sessionData = getSession(req, res)
-        // console.log("viewctrlr> sessionData:", sessionData)
-        // const userFirst = sessionData.name
-        // const userRole = sessionData.role
+        const userFirst = req.session.name
+        const userRole = req.session.role
 
         // Creating links to prev and next pages
         const categoryLink = category ? `&category=${category}` : "";
@@ -80,8 +82,11 @@ export const renderProducts = async (req, res) => {
             hasNextPage,
             prevLink,
             nextLink,
-            //userFirst,
-            //userRole
+            user: {
+                name: userFirst,
+                role: userRole
+            }
+
         });
     } catch (error) {
         res.render("products", {
