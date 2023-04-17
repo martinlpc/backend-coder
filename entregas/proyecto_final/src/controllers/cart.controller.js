@@ -1,12 +1,12 @@
 import { getManagerCarts } from "../dao/daoManager.js";
 
 const managerData = await getManagerCarts()
-const manager = new managerData()
+export const cartManager = new managerData()
 
 export const getCart = async (req, res) => {
     try {
-        const cart = await manager.getElementById(req.params.cid)
-        const popCart = await cart.populate({ path: 'products.productId', model: manager.productModel })
+        const cart = await cartManager.getElementById(req.params.cid)
+        const popCart = await cart.populate({ path: 'products.productId', model: cartManager.productModel })
 
         res.send({
             status: "success",
@@ -23,7 +23,7 @@ export const getCart = async (req, res) => {
 export const createCart = async (req, res) => {
     try {
         const newCart = {}
-        const data = await manager.addElements(newCart)
+        const data = await cartManager.addElements(newCart)
 
         res.send({
             status: "success",
@@ -41,7 +41,7 @@ export const createCart = async (req, res) => {
 
 export const addProduct = async (req, res) => {
     try {
-        const data = await manager.addProduct(req.params.cid, req.params.pid, 1)
+        const data = await cartManager.addProduct(req.params.cid, req.params.pid, 1)
 
         res.send({
             status: "success",
@@ -60,7 +60,7 @@ export const overwriteCart = async (req, res) => {
     try {
         const productsToAdd = req.body
 
-        const response = await manager.replaceAllProducts(req.params.cid, productsToAdd)
+        const response = await cartManager.replaceAllProducts(req.params.cid, productsToAdd)
 
         res.send({
             status: "success",
@@ -79,7 +79,7 @@ export const changeProductQuantity = async (req, res) => {
         const { quantity } = req.body
         const newQuantity = parseInt(quantity)
 
-        const updatedProduct = await manager.changeQuantity(req.params.cid, req.params.pid, newQuantity)
+        const updatedProduct = await cartManager.changeQuantity(req.params.cid, req.params.pid, newQuantity)
 
         res.send({
             status: "success",
@@ -96,7 +96,7 @@ export const changeProductQuantity = async (req, res) => {
 
 export const removeProduct = async (req, res) => {
     try {
-        const cart = await manager.removeProduct(req.params.cid, req.params.pid)
+        const cart = await cartManager.removeProduct(req.params.cid, req.params.pid)
 
         res.send({
             status: "success",
@@ -113,7 +113,7 @@ export const removeProduct = async (req, res) => {
 
 export const clearCart = async (req, res) => {
     try {
-        const cart = await manager.emptyCart(req.params.cid)
+        const cart = await cartManager.emptyCart(req.params.cid)
         res.send({
             status: "success",
             payload: cart

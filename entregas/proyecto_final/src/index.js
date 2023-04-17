@@ -5,7 +5,7 @@ import express from 'express'
 import multer from 'multer'
 import { engine } from 'express-handlebars'
 import { Server } from 'socket.io'
-//import { getManagerMessages } from './dao/daoManager.js'
+//import { getmessageManager } from './dao/daoManager.js'
 import { __dirname } from "./path.js";
 import * as path from 'path'
 import MongoStore from 'connect-mongo'
@@ -13,6 +13,7 @@ import cookieParser from 'cookie-parser'
 import session from 'express-session';
 import initializePassport from './config/passport.js'
 import passport from 'passport'
+import { messageManager } from './controllers/message.controller.js'
 
 const app = express()
 
@@ -24,11 +25,12 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.URLMONGODB,
         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-        ttl: 60 * 5
+        ttl: 60 * 2
     }),
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: false,
+    rolling: false
 }))
 
 // Passport
@@ -69,21 +71,18 @@ const server = app.listen(app.get("port"), () => {
 // ServerIO to manage socket messages (chat)
 const io = new Server(server)
 
-// const data = await getManagerMessages();
-// export const managerMessages = new data();
-
 io.on("connection", async (socket) => {
     console.log("Connection detected")
 
     socket.on("message", async newMessage => {
-        await managerMessages.addElements([newMessage])
-        const messages = await managerMessages.getElements()
+        await messageManager.addElements([newMessage])
+        const messages = await messageManager.getElements()
         console.log(messages)
         io.emit("allMessages", messages)
     })
 
     socket.on("load messages", async () => {
-        const messages = await managerMessages.getElements()
+        const messages = await messageManager.getElements()
         console.log(messages)
         io.emit("allMessages", messages)
     })

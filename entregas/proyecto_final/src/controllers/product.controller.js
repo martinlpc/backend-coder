@@ -1,7 +1,7 @@
 import { getManagerProducts } from "../dao/daoManager.js";
 
-const managerData = await getManagerProducts()
-const manager = new managerData()
+const managerProductsData = await getManagerProducts()
+export const productManager = new managerProductsData()
 
 export const getProducts = async (req, res) => {
     let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
@@ -30,7 +30,7 @@ export const getProducts = async (req, res) => {
             }
         }
 
-        const products = await manager.paginate(filter, options)
+        const products = await productManager.paginate(filter, options)
 
         if ((page > products.totalPages) || (page <= 0)) throw new Error("Parameter 'page' is out of range")
 
@@ -67,7 +67,7 @@ export const getProducts = async (req, res) => {
 
 export const getProduct = async (req, res) => {
     try {
-        const product = await manager.getElementById(req.params.pid)
+        const product = await productManager.getElementById(req.params.pid)
         res.status(200).send({
             status: "success",
             payload: product
@@ -83,7 +83,7 @@ export const getProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const info = req.body
-        const data = await manager.addElements(info)
+        const data = await productManager.addElements(info)
         console.log(data)
 
         res.status(200).send({
@@ -101,7 +101,7 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
-        const data = await manager.updateElement(req.params.pid, req.body)
+        const data = await productManager.updateElement(req.params.pid, req.body)
         res.status(200).send({
             status: "success",
             payload: data
@@ -116,7 +116,7 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     try {
-        const data = await manager.deleteElement(req.params.pid)
+        const data = await productManager.deleteElement(req.params.pid)
 
         res.status(200).send({
             status: "success",

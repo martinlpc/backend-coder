@@ -1,7 +1,3 @@
-import { userManager } from "./user.controller.js";
-import { validatePassword } from "../utils/bcrypt.js";
-import passport from "passport";
-
 export const getSession = (req, res) => {
     try {
         if (req.session.login) {
@@ -20,67 +16,45 @@ export const getSession = (req, res) => {
     }
 };
 
-export const tryLogin = async (req, res) => {
-    passport.authenticate('login', (error, user) => {
-        try {
-            if (error) {
-                console.log(`TRYLOGIN> error`)
-                req.session.message = "An error ocurred, try again later"
-                res.redirect('/login')
-            }
-            if (!user) {
-                console.log(`TRYLOGIN> incorrect credentials`)
-                req.session.message = "Username or password incorrect"
-                res.redirect('/login')
-            }
-
-            console.log(`TRYLOGIN> authenticated`)
-            req.session.login = true
-            req.session.name = user.first_name
-            req.session.role = user.role
-
-            res.redirect('/products')
-        } catch (error) {
-            res.status(500).json({
-                message: error.message
-            })
-        }
-    })(req, res)
+export const getCurrentSession = (req, res) => {
+    try {
+        !req.session.login ? res.send(`No session active`) : res.send({ status: "success", payload: req.user })
+    } catch (error) {
+        res.status(500).send({
+            message: error.message
+        })
+    }
 }
 
-// export const checkLogin = async (req, res) => {
-//     try {
-//         // Get login info from form
-//         const { email, password } = req.body;
+export const tryLogin = async (req, res) => {
 
-//         if (email === "adminCoder@coder.com" && password === "adminCod3r123") {
-//             req.session.login = true;
-//             req.session.user.first_name = "Admin Coder";
-//             req.session.user.role = "admin";
-//             console.log(`sessionctrler> ${email} logged in`);
-//             res.redirect("/products");
-//         } else {
-//             const user = await userManager.getUserByEmail(email);
+    try {
+        if (!req.user) {
+            return res.status(401).send({
+                status: "error",
+                error: "Invalidated user"
+            })
+        }
+        console.log(`TRYLOGIN> authenticated`)
+        req.session.login = true
+        console.log(`TRYLOGIN> req.user: ${req.user}`)
+        req.session.user = {
+            first_name: req.user.first_name,
+            last_name: req.user.last_name,
+            email: req.user.email,
+            cart_id: req.user.cart_id
+        }
+        req.session.name = req.user.first_name
+        req.session.role = req.user.role
 
-//             if (user && validatePassword(password, user.password)) {
-//                 console.log("sessionctrler> pass valid");
-//                 req.session.login = true;
-//                 //req.session.user.first_name = user.first_name
-//                 // req.session.user.role = user.role
-//                 console.log(`sessionctrler> ${email} logged in as ${user.role}`);
-//                 res.redirect("/products");
-//             } else {
-//                 res.status(401).json({
-//                     message: "User or password incorrect",
-//                 });
-//             }
-//         }
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message,
-//         });
-//     }
-// };
+        res.redirect('/products')
+    } catch (error) {
+        console.log(`TRYLOGIN[error]> ${error.message}`)
+        res.status(500).send({
+            message: error.message
+        })
+    }
+}
 
 export const destroySession = (req, res) => {
     try {
@@ -88,6 +62,8 @@ export const destroySession = (req, res) => {
             req.session.destroy();
             console.log(`SESSIONCTRL> Session closed`);
             res.status(200).redirect("/");
+        } else {
+            res.status(200).send(`No session active`)
         }
     } catch (error) {
         res.status(500).json({
