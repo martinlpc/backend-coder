@@ -90,7 +90,7 @@ export const addProducts = async (req, res) => {
     }
 }
 
-export const updateProduct = async (req, res) => {
+export const modifyProduct = async (req, res) => {
     const productID = req.params.pid
     const productData = req.body
 
@@ -109,7 +109,7 @@ export const updateProduct = async (req, res) => {
     }
 }
 
-export const deleteProduct = async (req, res) => {
+export const removeProduct = async (req, res) => {
     const productID = req.params.pid
     try {
         const product = await deleteProduct(productID)

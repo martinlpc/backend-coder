@@ -1,4 +1,4 @@
-import { findUsers, findUserById } from "../services/userServices.js";
+import { findUsers } from "../services/userServices.js";
 
 export const getUsers = async (req, res) => {
     try {

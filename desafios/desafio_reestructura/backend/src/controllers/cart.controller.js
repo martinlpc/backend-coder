@@ -24,10 +24,10 @@ export const getCart = async (req, res) => {
     }
 }
 
-export const createCart = async (req, res) => {
+export const createNewCart = async (req, res) => {
     try {
         const newCart = {}
-        const data = await cartManager.addElements(newCart)
+        const data = await createCart(newCart)
 
         res.send({
             status: "success",
