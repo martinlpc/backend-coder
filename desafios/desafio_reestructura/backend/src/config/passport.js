@@ -48,7 +48,7 @@ const initializePassport = () => {
                         email: email,
                         password: hashPassword,
                         role: "user",
-                        cart_id: newCart[0]._id
+                        cart_id: newCart._id
                     });
 
                     return done(null, createdUser);

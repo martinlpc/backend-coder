@@ -13,11 +13,7 @@ const envFilePath = environment === 'DEVELOPMENT'
     ? './.env.development'
     : './.env.production';
 
-console.log(envFilePath)
-
 dotenv.config({ path: envFilePath });
-
-console.log(process.env.PORT)
 
 // export default {
 //     port: process.env.PORT,

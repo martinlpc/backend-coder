@@ -1,6 +1,6 @@
 // * Server
 import './config/config.js'
-import 'dotenv/config.js'
+//import 'dotenv/config.js'
 import router from './routes/index.routes.js'
 import express from 'express'
 //import multer from 'multer'

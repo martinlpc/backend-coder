@@ -1,7 +1,7 @@
 import passport from "passport";
 import { createUser } from "../services/userServices.js";
 
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
     try {
         passport.authenticate('register', async (err, user) => {
             if (err) {
@@ -18,7 +18,7 @@ export const registerUser = async (req, res) => {
         })(req, res, next)
     } catch (error) {
         res.status(500).send({
-            message: "Server internal error",
+            message: "Internal server error",
             error: error.message
         })
     }
@@ -39,7 +39,7 @@ export const loginUser = async (req, res, next) => {
             req.session.login = true
             req.session.user = user
 
-            return res.status(200).send(`Welcome ${rq.session.user.sole} ${req.session.user.first_name}`)
+            return res.status(200).send(`Welcome ${req.session.user.role} ${req.session.user.first_name}`)
         })(req, res, next)
     } catch (error) {
         res.status(500).send({
