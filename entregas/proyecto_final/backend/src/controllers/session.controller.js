@@ -39,6 +39,8 @@ export const loginUser = async (req, res, next) => {
             req.session.login = true
             req.session.user = user
 
+            console.log(`Logon detected: ${req.session.user.email}`)
+
             return res.status(200).send(`Welcome ${req.session.user.role} ${req.session.user.first_name}`)
         })(req, res, next)
     } catch (error) {
@@ -80,3 +82,57 @@ export const getSession = async (req, res) => {
         })
     }
 }
+
+export const isSessionActive = async (req, res, next) => {
+    try {
+        if (req.session.login) {
+            return next()
+        } else {
+            return res.status(401).send('No active session')
+        }
+    } catch (error) {
+        res.status(500).send({
+            message: "Server internal error",
+            error: error.message
+        })
+    }
+}
+
+// export const authAdmin = async (req, res, next) => {
+//     if (req.session.login) {
+//         if (req.session.user.role === "admin") {
+//             return next()
+//         } else {
+//             res.status(403).send('Unauthorized action. Log in as admin.')
+//         }
+//     } else {
+//         res.status(403).send('Unauthorized action. Log in as admin.')
+//     }
+// }
+
+// export const authUser = async (req, res, next) => {
+//     if (req.session.login) {
+//         if (req.session.user.role === 'user') {
+//             return next()
+//         } else {
+//             res.status(403).send('Unauthorized action. Log in as user.')
+//         }
+//     } else {
+//         res.status(403).send('Unauthorized action. Log in as user.')
+//     }
+// }
+
+export const checkRole = (role) => {
+    return (req, res, next) => {
+        if (req.session.login) {
+            if (req.session.user.role !== role) {
+                return res.status(401).send(`Action not allowed to ${req.session.user.role}`)
+            } else {
+                next()
+            }
+        } else {
+            return res.status(401).send(`No active session found`)
+        }
+    }
+}
+

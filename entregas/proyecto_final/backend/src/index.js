@@ -24,7 +24,7 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URL,
         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-        ttl: 60 * 2
+        ttl: 60 * 60
     }),
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -43,7 +43,7 @@ app.use(passport.session())
 // app.set('views', path.resolve(__dirname, './views'))
 
 // Port setting
-app.set("port", process.env.PORT || 8080)
+app.set("port", process.env.PORT)
 
 // Multer settings
 // const storage = multer.diskStorage({

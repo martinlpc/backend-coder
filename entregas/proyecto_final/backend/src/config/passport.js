@@ -1,5 +1,6 @@
 import local from "passport-local";
 import passport from "passport";
+import mongoose from "mongoose";
 import GitHubStrategy from "passport-github2";
 import { createUser, findUserByEmail } from "../services/userServices.js";
 import { createCart } from "../services/cartServices.js";
@@ -8,27 +9,6 @@ import { createHash, validatePassword } from "../utils/bcrypt.js";
 const LocalStrategy = local.Strategy;
 
 const initializePassport = () => {
-    // const cookieExtractor = (req) => {
-    //     // If cookies exists, verify there is a jwt cookie
-    //     const token = req.cookies ? req.cookies.jwtCookies : null;
-    //     return token;
-    // };
-
-    // passport.use("jwt",
-    //     new JWTStrategy(
-    //         {
-    //             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-    //             secretOrKey: process.env.COOKIE_SECRET,
-    //         },
-    //         async (jwt_payload, done) => {
-    //             try {
-    //                 return done(null, jwt_payload);
-    //             } catch (error) {
-    //                 return done(error);
-    //             }
-    //         }
-    //     )
-    // );
 
     passport.use("register",
         new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, username, password, done) => {
@@ -62,34 +42,35 @@ const initializePassport = () => {
     passport.use("login",
         new LocalStrategy({ usernameField: "email" }, async (username, password, done) => {
             try {
-                // ! CHEQUEAR ESTA SECCION DE ADMIN
-                // if (username === "adminCoder@coder.com" && password === "adminCod3r123") {
-                //     const user = {
-                //         _id: new mongoose.Types.ObjectId(),
-                //         first_name: "AdminCoder",
-                //         last_name: " ",
-                //         email: "adminCoder@coder.com",
-                //         password: " ", // Default password required by Challenge #5
-                //         role: "admin",
-                //     };
-                //     return done(null, user);
-                // }
-
-                const user = await findUserByEmail(username);
-                console.log(`PASSPORT[login]> user logging-in: ${user.email}`);
-                if (!user) {
-                    //User not found
-                    console.log(`PASSPORT[login]> User not found`);
+                if (username === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+                    // ADMIN LOGIN
+                    const user = {
+                        _id: new mongoose.Types.ObjectId(),
+                        first_name: process.env.ADMIN_NAME,
+                        last_name: " ",
+                        email: process.env.ADMIN_EMAIL,
+                        password: " ", // Default password required by Challenge #5
+                        role: "admin",
+                    };
+                    return done(null, user);
+                } else {
+                    // USER LOGIN
+                    const user = await findUserByEmail(username);
+                    console.log(`PASSPORT[login]> user logging-in: ${user.email}`);
+                    if (!user) {
+                        //User not found
+                        console.log(`PASSPORT[login]> User not found`);
+                        return done(null, false);
+                    }
+                    if (validatePassword(password, user.password)) {
+                        //const token = generateToken(user);
+                        console.log(`PASSPORT[login]> User found: ${user}`);
+                        return done(null, user);
+                    }
+                    // Wrong password
+                    console.log("PASSPORT[login]> Wrong credentials");
                     return done(null, false);
                 }
-                if (validatePassword(password, user.password)) {
-                    //const token = generateToken(user);
-                    console.log(`PASSPORT[login]> User found: ${user}`);
-                    return done(null, user);
-                }
-                // Wrong password
-                console.log("PASSPORT[login]> Wrong credentials");
-                return done(null, false);
             } catch (error) {
                 return done(error);
             }
