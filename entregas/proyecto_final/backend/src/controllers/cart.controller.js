@@ -1,8 +1,7 @@
 import productModel from "../models/MongoDB/productModel.js"
-import { findCartById, updateCart, createCart } from "../services/cartServices.js"
+import { findCartById, updateCart, createCart, removeFromCart } from "../services/cartServices.js"
 import { findProductById, updateProduct } from "../services/productServices.js"
 
-import ticketModel from "../models/MongoDB/ticketModel.js"
 import { createTicket } from "../services/ticketServices.js"
 
 export const getCart = async (req, res) => {
@@ -124,7 +123,7 @@ export const changeProductQuantity = async (req, res) => {
 
 export const removeProduct = async (req, res) => {
     try {
-        const cart = await cartManager.removeProduct(req.params.cid, req.params.pid)
+        const cart = await updateCart(req.params.cid, req.body)
 
         res.send({
             status: "success",
@@ -135,7 +134,6 @@ export const removeProduct = async (req, res) => {
             status: "error",
             payload: error.message
         })
-
     }
 }
 
@@ -178,7 +176,6 @@ export const purchaseCart = async (req, res) => {
 
             let totalAmount = 0
             products.forEach(elem => {
-                totalAmount += elem.productId.price * elem.quantity
                 let stockBeforePurchase = parseInt(elem.productId.stock)
                 let stockAfterPurchase = stockBeforePurchase - elem.quantity
                 let productID = elem.productId._id
@@ -188,7 +185,14 @@ export const purchaseCart = async (req, res) => {
                 console.log(`[purchase] selected quantity: ${elem.quantity}`)
                 console.log(`[purchase] stock after: ${stockAfterPurchase}`)
 
-                updateProduct(productID, { stock: stockAfterPurchase })
+                if (stockAfterPurchase >= 0) {
+                    totalAmount += elem.productId.price * elem.quantity
+                    updateProduct(productID, { stock: stockAfterPurchase })
+                } else {
+                    console.log(`[purchase] insufficient stock, removing item "${elem.productId.title}" from the purchase`)
+                    removeFromCart(cartID, productID)
+                }
+
             })
             console.log(`Purchase total amount: $ ${totalAmount}`)
 

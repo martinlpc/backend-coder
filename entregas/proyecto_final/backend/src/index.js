@@ -1,10 +1,9 @@
 // * Server
 import './config/config.js'
-//import 'dotenv/config.js'
 import router from './routes/index.routes.js'
 import express from 'express'
 //import multer from 'multer'
-//import { engine } from 'express-handlebars'
+import { engine } from 'express-handlebars'
 import { __dirname } from "./path.js";
 import * as path from 'path'
 import mongoose from 'mongoose';
@@ -37,10 +36,10 @@ initializePassport()
 app.use(passport.initialize())
 app.use(passport.session())
 
-// // Handlebars as template engine
-// app.engine('handlebars', engine());
-// app.set('view engine', 'handlebars');
-// app.set('views', path.resolve(__dirname, './views'))
+// Handlebars as template engine
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', path.resolve(__dirname, './views'))
 
 // Port setting
 app.set("port", process.env.PORT)
@@ -74,7 +73,6 @@ app.use('/', router)
 app.use('/', express.static(__dirname + '/public'))
 
 // Server launch
-
 const server = app.listen(app.get("port"), () => {
     console.log(`Server running on http://localhost:${app.get("port")}`)
 })

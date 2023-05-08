@@ -1,5 +1,4 @@
 import passport from "passport";
-import { createUser } from "../services/userServices.js";
 
 export const registerUser = async (req, res, next) => {
     try {
@@ -54,8 +53,9 @@ export const loginUser = async (req, res, next) => {
 export const destroySession = async (req, res) => {
     try {
         if (req.session.login) {
+            const username = req.session.user.first_name
             req.session.destroy()
-            res.status(200).send(`Session terminated.`)
+            res.status(200).send(`Session "${username}" terminated.`)
         } else {
             return res.status(401).send(`No active session found`)
         }
