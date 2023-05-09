@@ -188,25 +188,38 @@ export const purchaseCart = async (req, res) => {
                 if (stockAfterPurchase >= 0) {
                     totalAmount += elem.productId.price * elem.quantity
                     updateProduct(productID, { stock: stockAfterPurchase })
-                } else {
-                    console.log(`[purchase] insufficient stock, removing item "${elem.productId.title}" from the purchase`)
+                    /* 
+                        Products succesfully purchased are removed
+                        Those with insufficient stock are retained in the cart but not considered in the purchase
+                    */
                     removeFromCart(cartID, productID)
+                } else {
+                    console.log(`[purchase] insufficient stock, returning item "${elem.productId.title}" to the cart`)
                 }
 
             })
             console.log(`Purchase total amount: $ ${totalAmount}`)
 
-            const newTicket = await createTicket({
-                total_amount: totalAmount,
-                purchaser: purchaser
-            })
+            if (totalAmount <= 0) {
 
-            const savedTicket = await newTicket.save()
-            await updateCart(cartID, { products: [] })
-            return res.status(200).send({
-                message: `Purchase completed`,
-                invoice: savedTicket
-            })
+                return res.status(200).send({
+                    message: `Purchase cancelled. The products in the cart are unavailable due to stock`,
+                    cart_content: populatedCart
+                })
+            } else {
+                const newTicket = await createTicket({
+                    total_amount: totalAmount,
+                    purchaser: purchaser
+                })
+
+                const savedTicket = await newTicket.save()
+                //await updateCart(cartID, { products: [] })
+                return res.status(200).send({
+                    message: `Purchase completed`,
+                    invoice: savedTicket
+                })
+            }
+
 
         } catch (error) {
             console.error(error)

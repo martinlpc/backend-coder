@@ -12,6 +12,8 @@ import cookieParser from 'cookie-parser'
 import session from 'express-session';
 import initializePassport from './config/passport.js'
 import passport from 'passport'
+import { Server as SocketServer } from 'socket.io'
+import { readMessages, createMessage } from './services/messageServices.js';
 
 const app = express()
 
@@ -75,5 +77,28 @@ app.use('/', express.static(__dirname + '/public'))
 // Server launch
 const server = app.listen(app.get("port"), () => {
     console.log(`Server running on http://localhost:${app.get("port")}`)
+})
+
+// Socket server for chat service
+export const chatServer = new SocketServer(server)
+console.log(`Chat server online`)
+chatServer.on("connection", async (socket) => {
+    console.log("Connection to chat detected")
+
+    socket.on("message", async newMessage => {
+        //await managerMessages.addElements([newMessage])
+        await createMessage([newMessage])
+        //const messages = await managerMessages.getElements()
+        const messages = await readMessages()
+        console.log(messages)
+        chatServer.emit("allMessages", messages)
+    })
+
+    socket.on("load messages", async () => {
+        //const messages = await managerMessages.getElements()
+        const messages = await readMessages()
+        console.log(messages)
+        chatServer.emit("allMessages", messages)
+    })
 })
 

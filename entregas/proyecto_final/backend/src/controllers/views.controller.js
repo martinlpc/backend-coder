@@ -37,6 +37,10 @@ export const viewCart = async (req, res) => {
     })
 }
 
+export const viewChat = async (req, res) => {
+    res.render('chat')
+}
+
 export const renderProducts = async (req, res) => {
     try {
         let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
