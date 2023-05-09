@@ -85,17 +85,14 @@ console.log(`Chat server online`)
 chatServer.on("connection", async (socket) => {
     console.log("Connection to chat detected")
 
-    socket.on("message", async newMessage => {
-        //await managerMessages.addElements([newMessage])
+    socket.on("message", async () => {
         await createMessage([newMessage])
-        //const messages = await managerMessages.getElements()
         const messages = await readMessages()
         console.log(messages)
         chatServer.emit("allMessages", messages)
     })
 
     socket.on("load messages", async () => {
-        //const messages = await managerMessages.getElements()
         const messages = await readMessages()
         console.log(messages)
         chatServer.emit("allMessages", messages)

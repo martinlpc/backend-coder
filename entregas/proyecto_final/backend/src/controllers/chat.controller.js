@@ -23,13 +23,18 @@ export const sendMessage = async (req, res) => {
     const { first_name, last_name, email } = req.session.user
 
     try {
-        await createMessage({
+        const sentMessage = await createMessage({
             name: `${first_name} ${last_name}`,
             email,
             message
         })
         const messages = await readMessages()
-        chatServer.emit()
+        chatServer.emit("message", messages)
+
+        res.status(200).send({
+            message: `Message sent`,
+            payload: sentMessage.message
+        })
 
     } catch (error) {
 

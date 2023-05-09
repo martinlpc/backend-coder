@@ -198,7 +198,7 @@ export const purchaseCart = async (req, res) => {
                 }
 
             })
-            console.log(`Purchase total amount: $ ${totalAmount}`)
+            console.log(`[purchase] total amount: $ ${totalAmount}`)
 
             if (totalAmount <= 0) {
 
@@ -213,9 +213,13 @@ export const purchaseCart = async (req, res) => {
                 })
 
                 const savedTicket = await newTicket.save()
-                //await updateCart(cartID, { products: [] })
+
+                let message
+                const finalCart = await findCartById(cartID)
+                finalCart.products > 0 ? message = `Purchase completed. Some products were not added due to insufficient stock` : message = `Purchase completed`
+
                 return res.status(200).send({
-                    message: `Purchase completed`,
+                    message: message,
                     invoice: savedTicket
                 })
             }

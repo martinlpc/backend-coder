@@ -2,7 +2,7 @@ import local from "passport-local";
 import passport from "passport";
 import mongoose from "mongoose";
 import GitHubStrategy from "passport-github2";
-import { createUser, findUserByEmail } from "../services/userServices.js";
+import { createUser, findUserByEmail, findUserById } from "../services/userServices.js";
 import { createCart } from "../services/cartServices.js";
 import { createHash, validatePassword } from "../utils/bcrypt.js";
 
@@ -128,7 +128,7 @@ const initializePassport = () => {
 
     // Eliminar sesión
     passport.deserializeUser(async (id, done) => {
-        const user = await userManager.getElementById(id);
+        const user = await findUserById(id);
         done(null, user);
     });
 };
