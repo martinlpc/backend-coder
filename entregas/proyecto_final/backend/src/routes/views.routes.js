@@ -9,6 +9,6 @@ routerViews.get('/login', viewLogin)
 routerViews.get('/register', viewRegister)
 routerViews.get('/products', isSessionActive, renderProducts)
 routerViews.get('/carts/:cid', checkRole("user"), viewCart)
-routerViews.get('/chat', viewChat)
+routerViews.get('/chat', isSessionActive, viewChat)
 
 export default routerViews

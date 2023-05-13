@@ -14,6 +14,7 @@ import initializePassport from './config/passport.js'
 import passport from 'passport'
 import { Server as SocketServer } from 'socket.io'
 import { readMessages, createMessage } from './services/messageServices.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express()
 
@@ -46,6 +47,15 @@ app.set('views', path.resolve(__dirname, './views'))
 // Port setting
 app.set("port", process.env.PORT)
 
+// Router
+app.use('/', router)
+
+// Pathfile
+app.use('/', express.static(__dirname + '/public'))
+
+// ERROR HANDLER (LAST MIDDLEWARE TO USE)
+app.use(errorHandler)
+
 // Multer settings
 // const storage = multer.diskStorage({
 //     destination: (req, file, cb) => {
@@ -68,11 +78,7 @@ const connectToMongoDB = async () => {
 
 connectToMongoDB()
 
-// Router
-app.use('/', router)
 
-// Pathfile
-app.use('/', express.static(__dirname + '/public'))
 
 // Server launch
 const server = app.listen(app.get("port"), () => {
@@ -83,9 +89,9 @@ const server = app.listen(app.get("port"), () => {
 export const chatServer = new SocketServer(server)
 console.log(`Chat server online`)
 chatServer.on("connection", async (socket) => {
-    console.log("Connection to chat detected")
+    console.log("[socket] Connection to chat detected")
 
-    socket.on("message", async () => {
+    socket.on("message", async (newMessage) => {
         await createMessage([newMessage])
         const messages = await readMessages()
         console.log(messages)

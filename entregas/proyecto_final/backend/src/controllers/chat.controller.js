@@ -4,7 +4,7 @@ import { createMessage, readMessages } from "../services/messageServices.js"
 export const getMessages = async (req, res) => {
     try {
         const messages = await readMessages()
-        console.log(messages)
+        console.log(`[chat] Get all chat msgs requested via API`)
 
         res.status(200).json({
             messages: messages

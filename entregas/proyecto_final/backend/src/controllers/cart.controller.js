@@ -61,9 +61,9 @@ export const addProduct = async (req, res) => {
 
                 await cart.save()
                 return res.status(200).send(`Product added to cart`)
-            } else {
-                return res.status(200).send(`Can't add product (reason: not found)`)
             }
+
+            return res.status(200).send(`Can't add product (reason: not found)`)
         } catch (error) {
             res.status(500).send({
                 error: error.message
@@ -206,25 +206,23 @@ export const purchaseCart = async (req, res) => {
                     message: `Purchase cancelled. The products in the cart are unavailable due to stock`,
                     cart_content: populatedCart
                 })
-            } else {
-                const newTicket = await createTicket({
-                    total_amount: totalAmount,
-                    purchaser: purchaser
-                })
-
-                const savedTicket = await newTicket.save()
-
-                let message
-                const finalCart = await findCartById(cartID)
-                finalCart.products > 0 ? message = `Purchase completed. Some products were not added due to insufficient stock` : message = `Purchase completed`
-
-                return res.status(200).send({
-                    message: message,
-                    invoice: savedTicket
-                })
             }
 
+            const newTicket = await createTicket({
+                total_amount: totalAmount,
+                purchaser: purchaser
+            })
 
+            const savedTicket = await newTicket.save()
+
+            let message
+            const finalCart = await findCartById(cartID)
+            finalCart.products > 0 ? message = `Purchase completed. Some products were not added due to insufficient stock` : message = `Purchase completed`
+
+            return res.status(200).send({
+                message: message,
+                invoice: savedTicket
+            })
         } catch (error) {
             console.error(error)
             res.status(500).send({

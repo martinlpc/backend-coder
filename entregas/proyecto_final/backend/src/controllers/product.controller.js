@@ -1,5 +1,8 @@
 import { findProductById, insertProducts, updateProduct, deleteProduct, paginateProducts } from "../services/productServices.js";
 
+// Error handling imports
+import CustomError from "../utils/errors/customError.js";
+
 export const getProducts = async (req, res) => {
     let { limit = 10, page = 1, category = undefined, stock = undefined, sort = undefined } = req.query;
 
@@ -74,19 +77,27 @@ export const getProduct = async (req, res) => {
     }
 }
 
-export const addProducts = async (req, res) => {
+export const addProducts = async (req, res, next) => {
     const productsData = req.body
+
     try {
         const products = await insertProducts(productsData)
-        res.status(200).send({
-            message: `Products added succesfully`,
+        res.status(201).send({
+            message: `Product(s) added succesfully`,
             payload: products
         })
     } catch (error) {
-        res.status(500).send({
-            message: `Error on adding products`,
-            error: error.message
-        })
+        if (error instanceof CustomError) {
+            res.status(400).json({
+                error: error.name,
+                message: error.message,
+            })
+        } else {
+            res.status(500).send({
+                message: `Error creating new products`,
+                error: error.message
+            })
+        }
     }
 }
 
@@ -99,7 +110,7 @@ export const modifyProduct = async (req, res) => {
         if (product) {
             return res.status(200).send(`Product up-to-date`)
         }
-        return res.status(200).send(`Product not found`)
+        return res.status(404).send(`Product not found`)
 
     } catch (error) {
         res.status(500).send({
@@ -114,9 +125,12 @@ export const removeProduct = async (req, res) => {
     try {
         const product = await deleteProduct(productID)
         if (product) {
-            return res.status(200).send(`Product deleted`)
+            return res.status(200).send({
+                status: `success`,
+                message: `Product ${product.title} [CODE: ${product.code}] deleted`
+            })
         }
-        return res.status(200).send(`Product not found`)
+        return res.status(404).send(`Product not found`)
     } catch (error) {
         res.status(500).send({
             message: `Error on deleting product`,

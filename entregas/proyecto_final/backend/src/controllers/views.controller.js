@@ -1,3 +1,4 @@
+import { getProducts } from "./product.controller.js"
 
 const PRODUCTS_URL = 'http://localhost:8080/api/products'
 const CARTS_URL = 'http://localhost:8080/api/carts'
@@ -48,7 +49,17 @@ export const viewCart = async (req, res) => {
 }
 
 export const viewChat = async (req, res) => {
-    res.render('chat')
+    console.log(`Enviando datos al render de chat:
+        ${req.session.user.first_name} ${req.session.user.last_name},
+        ${req.session.user.email},
+        ${req.session.user.role}`)
+    res.render('chat', {
+        userdata: {
+            name: `${req.session.user.first_name} ${req.session.user.last_name}`,
+            mail: req.session.user.email,
+            role: req.session.user.role
+        }
+    })
 }
 
 export const renderProducts = async (req, res) => {
@@ -66,11 +77,14 @@ export const renderProducts = async (req, res) => {
         const sortLink = sort ? `&sort=${sort}` : ""
         const pageLink = page ? `&page=${page}` : ""
 
-        console.log(`fetching: ${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
+        console.debug(`fetching: ${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
         const response = await fetch(`${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
         console.log(`resp: ${response}`)
         const data = await response.json()
         console.log(`data: ${data} `)
+
+        //const data = await getProducts(req, res)
+
         const { status, payload, totalPages, prevPage, nextPage, actualPage, hasPrevPage, hasNextPage, prevLink, nextLink } = data
 
         let statusBool = status === "success" ? true : false

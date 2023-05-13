@@ -1,3 +1,4 @@
+{{>navbar}}
 <h1>Live chat</h1>
 
 <div id='containerChatBox'>
@@ -7,8 +8,8 @@
 
 <div id='containerMessageForm'>
     <form id='messageForm'>
-        <input type='text' id='senderName' placeholder='Nombre' />
-        <input type='text' id='senderEmail' placeholder='e-mail' />
+        {{!-- <input type='text' id='senderName' placeholder='Nombre' />
+        <input type='text' id='senderEmail' placeholder='e-mail' /> --}}
         <input type='text' id='senderText' placeholder='Mensaje' />
         <button>Enviar</button>
     </form>
