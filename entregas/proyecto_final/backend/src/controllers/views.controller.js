@@ -49,17 +49,7 @@ export const viewCart = async (req, res) => {
 }
 
 export const viewChat = async (req, res) => {
-    console.log(`Enviando datos al render de chat:
-        ${req.session.user.first_name} ${req.session.user.last_name},
-        ${req.session.user.email},
-        ${req.session.user.role}`)
-    res.render('chat', {
-        userdata: {
-            name: `${req.session.user.first_name} ${req.session.user.last_name}`,
-            mail: req.session.user.email,
-            role: req.session.user.role
-        }
-    })
+    res.render('chat')
 }
 
 export const renderProducts = async (req, res) => {

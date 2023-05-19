@@ -4,16 +4,27 @@ const messageForm = document.getElementById("messageForm")
 const messageSender = document.getElementById("senderName")
 const messageEmail = document.getElementById("senderEmail")
 const messageText = document.getElementById("senderText")
+const sendButton = document.getElementById("sendButton")
 const chatBox = document.getElementById("chatBox")
 
-var sessionData = {
-    name: userdata.name,
-    mail: userdata.mail,
-    role: userdata.role
-}
+const SESSION_URL = 'http://localhost:8080/api/session/current'
+let sessionName, sessionEmail, sessionRole
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
     socket.emit("load messages")
+    const response = await fetch(SESSION_URL)
+    const sessionData = await response.json()
+
+    console.log("[chatsessiondata] ", sessionData)
+
+    if (sessionData.role === 'admin') {
+        messageText.value = 'ADMIN CANNOT SEND MESSAGES'
+        messageText.disabled = true
+        sendButton.disabled = true
+    }
+    sessionName = `${sessionData.first_name} ${sessionData.last_name}`
+    sessionEmail = sessionData.email
+
 })
 
 socket.on("allMessages", async message => {
@@ -39,7 +50,6 @@ messageForm.addEventListener("submit", e => {
     //     message: messageText.value
     // }
 
-    console.log(sessionData)
     if (sessionData.role === "user") {
 
         const newMessage = {
