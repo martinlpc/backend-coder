@@ -56,19 +56,19 @@ const initializePassport = () => {
                 } else {
                     // USER LOGIN
                     const user = await findUserByEmail(username);
-                    console.log(`PASSPORT[login]> user logging-in: ${user.email}`);
+
+                    //console.log(`PASSPORT[login]> user logging-in: ${user.email}`);
                     if (!user) {
                         //User not found
-                        console.log(`PASSPORT[login]> User not found`);
                         return done(null, false);
                     }
                     if (validatePassword(password, user.password)) {
                         //const token = generateToken(user);
-                        console.log(`PASSPORT[login]> User found: ${user}`);
+                        //console.log(`PASSPORT[login]> User found: ${user}`);
                         return done(null, user);
                     }
                     // Wrong password
-                    console.log("PASSPORT[login]> Wrong credentials");
+                    //console.log("PASSPORT[login]> Wrong credentials");
                     return done(null, false);
                 }
             } catch (error) {
@@ -85,14 +85,14 @@ const initializePassport = () => {
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                console.log(profile);
+                //console.log(profile);
                 const user = await findUserByEmail(profile._json.email);
 
                 if (user) {
-                    console.log("Found user on Github");
+                    //console.log("Found user on Github");
                     done(null, user);
                 } else {
-                    console.log("New Github user");
+                    log('info', "New Github user created");
 
                     const newCart = await createCart()
 

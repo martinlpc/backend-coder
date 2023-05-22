@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { checkRole, isSessionActive } from "../config/middlewares.js";
+import { checkRole, isSessionActive } from "../middlewares/session.js";
 import { renderProducts, viewCart, viewChat, viewLogin, viewRegister } from "../controllers/views.controller.js";
 
 const routerViews = Router()

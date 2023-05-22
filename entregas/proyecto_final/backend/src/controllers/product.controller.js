@@ -53,11 +53,10 @@ export const getProducts = async (req, res) => {
             hasNextPage: products.hasNextPage,
             prevLink: prevPageLink,
             nextLink: nextPageLink
-
         })
 
     } catch (error) {
-        console.log(error)
+        req.logger.error(`Error on getProducts controller - ${error.message}`)
         res.status(500).send({
             status: "error",
             error: error.message

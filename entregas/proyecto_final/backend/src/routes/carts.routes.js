@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { purchaseCart, getCart, addProduct, changeProductQuantity, clearCart, removeProduct, overwriteCart, createNewCart } from "../controllers/cart.controller.js";
-import { checkRole } from "../config/middlewares.js";
+import { checkRole } from "../middlewares/session.js";
 
 const routerCart = Router()
 
@@ -9,9 +9,9 @@ routerCart.use(checkRole("user"))
 
 routerCart.route('/')
     .post(createNewCart)
+    .get(getCart)
 
 routerCart.route('/:cid')
-    .get(getCart)
     .put(overwriteCart)
     .delete(clearCart)
 
@@ -22,7 +22,5 @@ routerCart.route('/:cid/product/:pid')
 
 routerCart.route('/purchase')
     .post(purchaseCart)
-
-
 
 export default routerCart

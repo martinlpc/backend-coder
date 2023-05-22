@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { checkRole, isSessionActive } from "../config/middlewares.js"
+import { checkRole, isSessionActive } from "../middlewares/session.js"
 import { getMessages, sendMessage } from "../controllers/chat.controller.js"
 
 export const routerChat = Router()

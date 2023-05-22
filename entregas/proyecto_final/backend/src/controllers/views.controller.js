@@ -60,6 +60,8 @@ export const renderProducts = async (req, res) => {
         const userFirst = req.session.user.first_name
         const userRole = req.session.user.role
 
+        req.logger.debug(`user data: ${userFirst} ${userRole}`)
+
         // Creating links to prev and next pages
         const categoryLink = category ? `&category=${category}` : ""
         const stockLink = stock ? `&stock=${stock}` : ""
@@ -67,11 +69,11 @@ export const renderProducts = async (req, res) => {
         const sortLink = sort ? `&sort=${sort}` : ""
         const pageLink = page ? `&page=${page}` : ""
 
-        console.debug(`fetching: ${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
+        req.logger.debug(`fetching: ${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
         const response = await fetch(`${PRODUCTS_URL}?${categoryLink}${stockLink}${limitLink}${sortLink}${pageLink}`)
-        console.log(`resp: ${response}`)
+        req.logger.debug(`resp: ${response}`)
         const data = await response.json()
-        console.log(`data: ${data} `)
+        req.logger.debug(`data: ${data} `)
 
         //const data = await getProducts(req, res)
 
@@ -97,10 +99,11 @@ export const renderProducts = async (req, res) => {
         })
         console.log(`status ${status} `)
     } catch (error) {
+        req.logger.error(`Error while loading products view - ${error.message}`)
         res.render('products', {
             status: "error",
             payload: error
         })
-        console.error(error)
+
     }
 }

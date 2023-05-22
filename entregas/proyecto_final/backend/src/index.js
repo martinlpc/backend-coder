@@ -15,12 +15,14 @@ import passport from 'passport'
 import { Server as SocketServer } from 'socket.io'
 import { readMessages, createMessage } from './services/messageServices.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { log, middlewareLogger } from './middlewares/logger.js';
 
 const app = express()
 
 // Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(middlewareLogger)
 app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(session({
     store: MongoStore.create({
@@ -72,35 +74,32 @@ const connectToMongoDB = async () => {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-        .catch((error) => console.log(error))
-    console.log(`Database connected`)
+        .catch(error => log('error', error.message))
+    log('info', `Database connected`)
 }
 
 connectToMongoDB()
 
-
-
 // Server launch
 const server = app.listen(app.get("port"), () => {
-    console.log(`Server running on http://localhost:${app.get("port")}`)
+    log('info', `Server running on http://localhost:${app.get("port")}`)
 })
 
 // Socket server for chat service
 export const chatServer = new SocketServer(server)
-console.log(`Chat server online`)
+log('info', `Chat server online`)
 chatServer.on("connection", async (socket) => {
-    console.log("[socket] Connection to chat detected")
+    log('info', "Connection to chat detected")
 
     socket.on("message", async (newMessage) => {
         await createMessage([newMessage])
         const messages = await readMessages()
-        console.log(messages)
+        log('info', 'New chat message received')
         chatServer.emit("allMessages", messages)
     })
 
     socket.on("load messages", async () => {
         const messages = await readMessages()
-        console.log(messages)
         chatServer.emit("allMessages", messages)
     })
 })

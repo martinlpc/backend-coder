@@ -29,6 +29,7 @@ export const getCart = async (req, res) => {
 
 export const createNewCart = async (req, res) => {
     try {
+        req.logger.http(`POST on /api/carts`)
         const newCart = {}
         const data = await createCart(newCart)
 
@@ -42,7 +43,8 @@ export const createNewCart = async (req, res) => {
             status: "error",
             payload: error.message
         })
-        console.log(error)
+        req.logger.error(error.message)
+        //console.log(error)
     }
 }
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getProducts, getProduct, addProducts, modifyProduct, removeProduct } from "../controllers/product.controller.js";
-import { checkRole, isSessionActive } from "../config/middlewares.js";
+import { checkRole, isSessionActive } from "../middlewares/session.js";
 
 const routerProduct = Router()
 
