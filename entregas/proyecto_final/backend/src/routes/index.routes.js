@@ -36,7 +36,7 @@ router.get('/loggerTest', (req, res) => {
         req.logger.fatal(`Fatal error message test`)
 
         res.status(200).send({
-            message: 'Logs registered and created'
+            message: 'Logs registered and/or created'
         })
     } catch (error) {
         req.logger.error(`Error on logger testing, really? - ${error.message}`)

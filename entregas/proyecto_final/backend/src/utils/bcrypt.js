@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt'
 
-export const createHash = (password) => {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(parseInt(process.env.SALT)))
+export const createHash = async (password) => {
+  return bcrypt.hash(password, await bcrypt.genSalt(parseInt(process.env.SALT)))
 }
 
-export const validatePassword = (password, storedPassword) => {
-    return bcrypt.compareSync(password, storedPassword)
+export const validatePassword = async (password, storedPassword) => {
+  return await bcrypt.compare(password, storedPassword)
 }

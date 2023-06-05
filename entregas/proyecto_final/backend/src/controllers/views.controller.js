@@ -1,14 +1,18 @@
-import { getProducts } from "./product.controller.js"
+//import { getProducts } from "./product.controller.js"
 
 const PRODUCTS_URL = 'http://localhost:8080/api/products'
 const CARTS_URL = 'http://localhost:8080/api/carts'
 
-export const viewLogin = async (req, res) => {
+export const viewLogin = async (req, res, next) => {
 
     const message = req.session.message
     delete req.session.message
 
-    res.render('login', { message })
+    if (req.session.user) {
+        res.redirect('/products')
+    } else {
+        res.render('login', { message })
+    }
 
 }
 
@@ -16,6 +20,14 @@ export const viewRegister = (req, res) => {
     const message = req.session.message
     delete req.session.message
     res.render('register', { message })
+}
+
+export const viewForgot = async (req, res) => {
+    res.render('forgotPassword')
+}
+
+export const viewReset = async (req, res) => {
+    res.render('resetPassword')
 }
 
 export const viewCart = async (req, res) => {

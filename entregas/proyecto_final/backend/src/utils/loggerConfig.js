@@ -10,7 +10,7 @@ const levels = {
     http: 4,
     debug: 5
 }
-// Los colores rompen el logfile, no se utilizan por el momento
+// Color only applied on dev logger, they break logfiles in production
 const colors = {
     fatal: 'red',
     error: 'magenta',
@@ -35,7 +35,7 @@ const outputPrintfFormat = winston.format.printf(info => {
 const devLogger = winston.createLogger({
     levels,
     format: winston.format.combine(
-        //winston.format.colorize({ colors: colors }),
+        winston.format.colorize({ colors: colors }),
         winston.format.timestamp({
             format: 'DD-MMM-YYYY HH:mm:ss'
         }),

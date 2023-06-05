@@ -1,3 +1,5 @@
+import { log } from "winston"
+
 const socket = io()
 
 const messageForm = document.getElementById("messageForm")
@@ -15,7 +17,7 @@ window.addEventListener("load", async () => {
     const response = await fetch(SESSION_URL)
     const sessionData = await response.json()
 
-    console.log("[chatsessiondata] ", sessionData)
+    log('debug', sessionData)
 
     if (sessionData.role === 'admin') {
         messageText.value = 'ADMIN CANNOT SEND MESSAGES'
