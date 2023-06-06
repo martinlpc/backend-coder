@@ -1,12 +1,11 @@
 import passport from 'passport';
-import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { createHash, validatePassword } from '../utils/bcrypt.js';
 import { transporter } from '../index.js';
 import { findUserByEmail, findUserById } from '../services/userServices.js';
 import { updateUser } from '../services/userServices.js';
-import { read } from 'fs';
 
+// Public functions
 export const registerUser = async (req, res, next) => {
   try {
     passport.authenticate('register', async (err, user) => {
@@ -212,6 +211,7 @@ export const getSession = async (req, res) => {
   }
 }
 
+// Internal functions 
 async function generatePasswordResetLink(user, req, res) {
   // const token = crypto.randomBytes(20).toString('hex')
   // await updateUser(user._id, {
@@ -231,10 +231,4 @@ async function generatePasswordResetLink(user, req, res) {
   req.logger.info(`Created password reset cookie: ${token}`)
 
   return `http://localhost:${process.env.PORT}/password/reset/${token}`
-}
-
-// TODO: aplicar testeo de timestamp en receivedCookie
-function isTokenExpired(receivedCookie, storedToken) {
-  const elapsedTime = Date.now() - storedToken.createdAt
-  return elapsedTime >= 1000 * 60 * 60
 }
