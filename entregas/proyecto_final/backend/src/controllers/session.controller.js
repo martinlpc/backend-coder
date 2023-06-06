@@ -1,9 +1,11 @@
 import passport from 'passport';
 import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
 import { createHash, validatePassword } from '../utils/bcrypt.js';
 import { transporter } from '../index.js';
-import { findUserByEmail } from '../services/userServices.js';
+import { findUserByEmail, findUserById } from '../services/userServices.js';
 import { updateUser } from '../services/userServices.js';
+import { read } from 'fs';
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -72,8 +74,11 @@ export const sendResetPasswordLink = async (req, res, next) => {
   try {
     const user = await findUserByEmail(email)
     if (!user) {
-      res.status(404).send('Email not found in database')
-      next()
+      res.status(404).send({
+        status: 'error',
+        message: 'Email not found in database'
+      })
+      return
     }
     // * User email found
 
@@ -83,74 +88,91 @@ export const sendResetPasswordLink = async (req, res, next) => {
       from: 'no-reply',
       to: email,
       subject: 'Password reset link',
-      text: `Hola,
-      Haz click en el siguiente enlace para reestablecer tu contraseña:
-      ${resetLink}
-
-      Si no solicitaste un cambio de contraseña, ignora este email.`
+      html: `
+      <p>Hola ${user.first_name},</p>
+      <p>Haz click <a href="${resetLink}">aquí</a> para reestablecer tu contraseña:</p>
+      
+      <p>Si no solicitaste un cambio de contraseña, ignora este email.</p>`
     }
     transporter.sendMail(mailToSend)
 
-    req.logger.debug(user)
-
     req.logger.info(`Password reset link sent to ${email}`)
-    res.status(200).send(`Password reset link sent to ${email}`)
+    res.status(200).send({
+      status: 'success',
+      message: `Password reset link sent to ${email}`
+    })
 
   } catch (error) {
     req.logger.error(`Error in password reset procedure - ${error.message}`)
     res.status(500).send({
-      message: 'Server internal error',
-      error: error.message
+      status: 'error',
+      message: error.message
     })
+    next(error)
   }
 }
 
-
 export const resetPassword = async (req, res, next) => {
-  const { email, password, confirmPassword } = req.body
+  const { password, confirmPassword, token } = req.body
+
+  if (!token) {
+    res.status(401).send({
+      status: 'error',
+      message: 'Token expired'
+    })
+    return
+  }
+
+  if (!password) {
+    res.status(400).send({
+      status: 'error',
+      message: 'Enter a valid password'
+    })
+    return
+  }
 
   try {
-    const browserCookie = req.signedCookies.resetToken
-    const user = await findUserByEmail(email)
+    const readToken = jwt.verify(token, process.env.JWT_SECRET)
+    const userID = readToken.user_id
+    const foundUser = await findUserById(userID)
 
-    if (!user) {
-      res.status(404).send('User email not found')
-      return
-    }
-
-    if (!browserCookie || isTokenExpired(browserCookie, user.resetToken)) {
-      res.status(401).send('Password reset link expired')
-      return
-    }
-
-    if (user.resetToken.token !== browserCookie) {
-      res.status(401).send('Unauthorized action')
-      return
+    if (!foundUser) {
+      res.status(404).send({
+        status: 'error',
+        message: 'User not found'
+      })
     }
 
     if (password !== confirmPassword) {
-      res.status(400).send('Both password fields must match')
+      res.status(400).send({
+        status: 'error',
+        message: 'Both password must match'
+      })
       return
     }
 
-    if (await validatePassword(password, user.password)) {
-      res.status(400).send('New password must be different from the current one')
+    if (await validatePassword(password, foundUser.password)) {
+      res.status(400).send({
+        status: 'error',
+        message: 'New password must be different from the current one'
+      })
       return
     }
 
-    // * Requirements passed, now we change the password
+    // * All test passed, change the password
     const newPassword = await createHash(password.toString())
-    await updateUser(user._id, {
-      password: newPassword,
-      resetToken: { token: '' }
+    await updateUser(foundUser._id, { password: newPassword, })
+    res.status(200).send({
+      status: 'success',
+      message: 'Password updated succesfully'
     })
-    res.status(200).send('Password updated. Redirecting to login.')
 
   } catch (error) {
     res.status(500).send({
       message: 'Error on password reset',
       error: error.message
     })
+    next(error)
   }
 }
 
@@ -191,28 +213,28 @@ export const getSession = async (req, res) => {
 }
 
 async function generatePasswordResetLink(user, req, res) {
-  const token = crypto.randomBytes(20).toString('hex')
+  // const token = crypto.randomBytes(20).toString('hex')
+  // await updateUser(user._id, {
+  //   resetToken: {
+  //     token: token,
+  //     createdAt: Date.now()
+  //   }
+  // })
+  // res.cookie('resetToken', token, {
+  //   signed: true,
+  //   maxAge: 1000 * 60 * 60
+  // })
 
-  await updateUser(user._id, {
-    resetToken: {
-      token: token,
-      createdAt: Date.now()
-    }
-  })
+  // ! Cambiar a JWT para no utilizar la DB en la auth
 
-  res.cookie('resetToken', token, {
-    signed: true,
-    maxAge: 1000 * 60 * 60
-  })
-  req.logger.info('Created password reset cookie')
+  const token = jwt.sign({ user_id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+  req.logger.info(`Created password reset cookie: ${token}`)
 
-  const link = `http://localhost:${process.env.PORT}/password/reset`
-  return link
+  return `http://localhost:${process.env.PORT}/password/reset/${token}`
 }
 
 // TODO: aplicar testeo de timestamp en receivedCookie
 function isTokenExpired(receivedCookie, storedToken) {
   const elapsedTime = Date.now() - storedToken.createdAt
-  const expirationTime = 1000 * 60 * 60
-  return elapsedTime >= expirationTime
+  return elapsedTime >= 1000 * 60 * 60
 }

@@ -28,18 +28,7 @@ const userSchema = new Schema({
   },
   cart_id: {
     type: Schema.Types.ObjectId,
-    ref: 'carts',
-  },
-  resetToken: {
-    token: {
-      type: String,
-      default: '',
-    },
-    createdAt: {
-      type: Date,
-      required: true,
-      default: Date.now
-    }
+    ref: 'carts'
   }
 });
 
