@@ -8,6 +8,6 @@ routerSession.get('/logout', destroySession)
 routerSession.get('/current', getSession)
 routerSession.post('/register', registerUser)
 routerSession.post('/password/createlink', sendResetPasswordLink)
-routerSession.post('/password/reset', resetPassword)
+routerSession.put('/password/reset', resetPassword)
 
 export default routerSession

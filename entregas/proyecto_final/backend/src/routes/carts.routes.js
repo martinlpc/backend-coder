@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { purchaseCart, getCart, addProduct, changeProductQuantity, clearCart, removeProduct, overwriteCart, createNewCart } from "../controllers/cart.controller.js";
-import { checkRole } from "../middlewares/session.js";
+import { Roles, checkRole } from "../middlewares/session.js";
 
 const routerCart = Router()
 
 // Middleware to use in every cart related request
-routerCart.use(checkRole("user"))
+routerCart.use(checkRole(Roles.USER))
 
 routerCart.route('/')
     .post(createNewCart)
@@ -15,8 +15,10 @@ routerCart.route('/:cid')
     .put(overwriteCart)
     .delete(clearCart)
 
-routerCart.route('/:cid/product/:pid')
+routerCart.route('/product/:pid')
     .post(addProduct)
+
+routerCart.route('/:cid/product/:pid')
     .put(changeProductQuantity)
     .delete(removeProduct)
 

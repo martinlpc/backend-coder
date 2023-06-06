@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { Roles } from "../../middlewares/session.js";
 
 const userSchema = new Schema({
   first_name: {
@@ -19,8 +20,8 @@ const userSchema = new Schema({
     required: true
   },
   role: {
-    type: String,
-    default: 'user'
+    type: Number,
+    default: Roles.USER
   },
   createdAt: {
     type: Date,

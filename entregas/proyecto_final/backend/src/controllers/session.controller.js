@@ -63,11 +63,6 @@ export const loginUser = async (req, res, next) => {
 }
 
 export const sendResetPasswordLink = async (req, res, next) => {
-  /* 
-    * Recibe mail
-    * Guarda en mongo la cookie asociada al user_id
-    * Envía a mail: {link de recuperacion}
-  */
   const { email } = req.body
 
   try {
@@ -213,19 +208,6 @@ export const getSession = async (req, res) => {
 
 // Internal functions 
 async function generatePasswordResetLink(user, req, res) {
-  // const token = crypto.randomBytes(20).toString('hex')
-  // await updateUser(user._id, {
-  //   resetToken: {
-  //     token: token,
-  //     createdAt: Date.now()
-  //   }
-  // })
-  // res.cookie('resetToken', token, {
-  //   signed: true,
-  //   maxAge: 1000 * 60 * 60
-  // })
-
-  // ! Cambiar a JWT para no utilizar la DB en la auth
 
   const token = jwt.sign({ user_id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
   req.logger.info(`Created password reset cookie: ${token}`)
