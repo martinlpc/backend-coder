@@ -84,7 +84,6 @@ const initializePassport = () => {
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        //console.log(profile);
         const user = await findUserByEmail(profile._json.email);
 
         if (user) {

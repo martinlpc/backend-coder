@@ -38,7 +38,7 @@ export const createNewCart = async (req, res) => {
       status: "success",
       payload: data
     })
-    console.log(data)
+
   } catch (error) {
     req.logger.error(error.message)
     res.status(500).send({
