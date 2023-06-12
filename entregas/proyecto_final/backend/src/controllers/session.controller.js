@@ -51,7 +51,7 @@ export const loginUser = async (req, res, next) => {
 
       req.logger.info(`User logged in < ${req.session.user.email} >`)
 
-      return res.status(200).send(`Welcome ${req.session.user.role} ${req.session.user.first_name}`)
+      return res.status(200).send(`Welcome ${req.session.user.first_name}`)
     })(req, res, next)
   } catch (error) {
     req.logger.error(`Error in log-in procedure - ${error.message}`)

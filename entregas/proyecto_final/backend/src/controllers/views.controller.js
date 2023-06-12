@@ -1,5 +1,7 @@
 //import { getProducts } from "./product.controller.js"
 
+import { Roles } from "../middlewares/session.js"
+
 const PRODUCTS_URL = 'http://localhost:8080/api/products'
 const CARTS_URL = 'http://localhost:8080/api/carts'
 
@@ -70,9 +72,9 @@ export const renderProducts = async (req, res) => {
 
         // Get session data prior to continue
         const userFirst = req.session.user.first_name
-        const userRole = req.session.user.role
-
-        req.logger.debug(`user data: ${userFirst} ${userRole}`)
+        let userRole = req.session.user.role
+        userRole = userRole === 1 ? 'Usuario' : 'Admin'
+        req.logger.debug(`user data: ${userFirst}: ${userRole}`)
 
         // Creating links to prev and next pages
         const categoryLink = category ? `&category=${category}` : ""
