@@ -34,6 +34,26 @@ export const updateCart = async (id, info) => {
     }
 }
 
+export const changeProductQuantity = async (cartID, productID, newQty) => {
+    try {
+        const cart = await findCartById(cartID)
+        if (!cart) {
+            throw new Error('Cart not found')
+        }
+
+        const productIndex = cart.products.findIndex(product => product.productId.equals(productID))
+        if (productIndex === -1) {
+            throw new Error('Product not found in the specified cart')
+        }
+
+        cart.products[productIndex].quantity = newQty
+        await cart.save()
+        return cart
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 export const removeFromCart = async (cartID, productID) => {
     try {
         const cart = await findCartById(cartID)

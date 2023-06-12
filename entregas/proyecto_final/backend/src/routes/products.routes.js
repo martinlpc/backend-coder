@@ -5,11 +5,11 @@ import { Roles, checkRole, isSessionActive } from "../middlewares/session.js";
 const routerProduct = Router()
 
 routerProduct.route('/')
-    .get(isSessionActive, getProducts)
+    .get(getProducts)
     .post(checkRole(Roles.ADMIN), addProducts)
 
 routerProduct.route('/:pid')
-    .get(isSessionActive, getProduct)
+    .get(getProduct)
     .put(checkRole(Roles.ADMIN), modifyProduct)
     .delete(checkRole(Roles.ADMIN), removeProduct)
 

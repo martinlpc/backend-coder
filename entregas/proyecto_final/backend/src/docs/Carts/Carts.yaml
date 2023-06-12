@@ -1,0 +1,400 @@
+paths:
+    /api/carts:
+        get:
+            summary: Returns an user cart, based on the current session (user logged in)
+            tags:
+                - Carts
+            responses:
+                '200':
+                    description: Cart found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/PopulatedCart'
+                '401':
+                    description: No active session
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: No active session
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                status:
+                                    type: string
+                                message:
+                                    type: string
+        post:
+            summary: Creates a new cart, asigned to the current session id (user logged in)
+            tags:
+                - Carts
+            responses:
+                '201':
+                    description: Cart created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/NewCart'
+
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+        put:
+            summary: Overwrites cart data
+            tags:
+                - Carts
+            requestBody:
+                description: Object or objects array, containing products to add
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                productId:
+                                    type: string
+                                quantity:
+                                    type: integer
+
+            responses:
+                '200':
+                    description: Cart overwritten
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/Cart'
+
+                '401':
+                    description: No active session
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: No active session
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+
+    /api/carts/{cid}:
+        delete:
+            summary: Deletes all the products contained into the cart
+            tags:
+                - Carts
+            parameters:
+                - name: cid
+                  in: path
+                  description: Cart ObjectID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                '200':
+                    description: Cart cleared
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: 'Cart id:456789 is now empty'
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+
+    /api/carts/product/{pid}:
+        post:
+            summary: Add a product to the session cart
+            tags:
+                - Carts
+            parameters:
+                - name: pid
+                  in: path
+                  description: Product ObjectID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                '201':
+                    description: Product added to the cart
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: Product added to the cart
+                '404':
+                    description: Product cannot be found
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: 'Cannot add product (reason: not found)'
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+
+    /api/carts/{cid}/product/{pid}:
+        put:
+            summary: Changes the quantity of a product held into the cart
+            tags:
+                - Carts
+            parameters:
+                - name: cid
+                  in: path
+                  required: true
+                  description: Cart ObjectID
+                  schema:
+                      type: string
+                - name: pid
+                  in: path
+                  required: true
+                  description: Product ObjectID
+                  schema:
+                      type: string
+            requestBody:
+                description: New quantity of the selected product
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                quantity:
+                                    type: integer
+
+            responses:
+                '200':
+                    description: Cart's product quantity updated
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    status:
+                                        type: string
+                                    payload:
+                                        type: object
+                '401':
+                    description: No active session
+                    content:
+                        text/plain:
+                            schema:
+                                type: string
+                                example: No active session
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+        delete:
+            summary: Removes a product from the cart
+            tags:
+                - Carts
+            parameters:
+                - name: cid
+                  in: path
+                  required: true
+                  description: Cart ObjectID
+                  schema:
+                      type: string
+                - name: pid
+                  in: path
+                  required: true
+                  description: Product ObjectID
+                  schema:
+                      type: string
+            responses:
+                '200':
+                    description: Product removed from cart
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                    payload:
+                                        type: object
+
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+
+    /api/carts/purchase:
+        post:
+            summary: Purchases the user cart and creates an invoice
+            tags:
+                - Carts
+            responses:
+                '201':
+                    description: Purchase completed
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/InvoiceResponse'
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/DefaultError500'
+
+components:
+    schemas:
+        Cart:
+            type: object
+            properties:
+                _id:
+                    type: string
+                products:
+                    type: array
+                __v:
+                    type: integer
+            example:
+                _id: ObjectID('123456')
+                products:
+                    productId: ObjectID('09876')
+                    quantity: 2
+                __v: 0
+        DefaultError500:
+            type: object
+            properties:
+                status:
+                    type: string
+                message:
+                    type: string
+            example:
+                status: error
+                message: Internal server error
+        NewCart:
+            type: object
+            properties:
+                status:
+                    type: string
+                payload:
+                    type: object
+            example:
+                status: success
+                payload:
+                    _id: ObjectID('123456')
+                    products: []
+                    __v: 0
+        CartProduct:
+            type: object
+            description: Populated info of the cart
+            properties:
+                _id:
+                    type: ObjectID
+                title:
+                    type: String
+                description:
+                    type: String
+                code:
+                    type: String
+                price:
+                    type: Number
+                status:
+                    type: Boolean
+                stock:
+                    type: Integer
+                category:
+                    type: String
+                thumbnails:
+                    type: Array
+                __v:
+                    type: Integer
+                    description: Count of modifications on that item
+            example:
+                _id: ObjectId("12bb12bb12bb12bb12bb12bb")
+                title: 'Kong Extreme Large'
+                description: 'Juguete rellenable de comida super resistente para tu perro'
+                code: 'KONG-DOG-L-FOOD'
+                price: '4500.00'
+                status: true
+                stock: 10
+                category: 'Juguetes'
+                thumbnails: ['/kong_1.jpg', '/kong_2.jpg']
+        PopulatedCart:
+            type: object
+            properties:
+                cart:
+                    type: object
+                    properties:
+                        _id:
+                            type: string
+                            description: Cart ObjectID
+                        products:
+                            type: object
+                            properties:
+                                productId:
+                                    type: object
+                                    description: Populated info of the cart
+                                    properties:
+                                        _id:
+                                            type: string
+                                        title:
+                                            type: string
+                                        description:
+                                            type: string
+                                        code:
+                                            type: string
+                                        price:
+                                            type: number
+                                        status:
+                                            type: boolean
+                                        stock:
+                                            type: integer
+                                        category:
+                                            type: string
+                                        thumbnails:
+                                            type: array
+                                        __v:
+                                            type: integer
+                                            description: Count of modifications on that item
+                                quantity:
+                                    type: integer
+                                    description: Units of that product in the cart
+                                _id:
+                                    type: string
+                                    description: Product ObjectID
+                        __v:
+                            type: integer
+                            description: Count of modifications on that item
+        InvoiceResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                invoice:
+                    type: object
+                    properties:
+                        _id:
+                            type: string
+                        code:
+                            type: number
+                        purchase_datetime:
+                            type: date
+                        total_amount:
+                            type: number
+                        purchaser:
+                            type: string
+            example:
+                message: Purchase completed. Some products were not added due to insufficient stock
+                invoice:
+                    _id: ObjectID('123456')
+                    code: 5678741
+                    purchase_datetime: 10/may/2023
+                    total_amount: 6845.00
+                    purchaser: user@mail.com

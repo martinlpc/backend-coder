@@ -93,8 +93,8 @@ export const addProducts = async (req, res, next) => {
             })
         } else {
             res.status(500).send({
-                message: `Error creating new products`,
-                error: error.message
+                status: `Error creating new products`,
+                message: error.message
             })
         }
     }
@@ -113,8 +113,8 @@ export const modifyProduct = async (req, res) => {
 
     } catch (error) {
         res.status(500).send({
-            message: `Error on updating product`,
-            error: error.message
+            status: `Error on updating product`,
+            message: error.message
         })
     }
 }

@@ -17,10 +17,18 @@ import { Server as SocketServer } from 'socket.io'
 import { readMessages, createMessage } from './services/messageServices.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { log, middlewareLogger } from './middlewares/logger.js';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express'
 
 const app = express()
 
-// Middlewares
+/*
+  ***********
+  Middlewares
+  ***********
+*/
+
+// * Express, Winston Logger and Session
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(middlewareLogger)
@@ -37,26 +45,41 @@ app.use(session({
   rolling: false
 }))
 
-// Passport
+// * Swagger API documentation
+const swaggerOpts = {
+  definition: {
+    openapi: '3.0.1',
+    info: {
+      title: "Natufriend - API documentation",
+      description: "Description of the APIRest"
+    }
+  },
+  apis: [`${__dirname}/docs/**/*.yaml`]
+}
+const specs = swaggerJSDoc(swaggerOpts)
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
+
+
+// * Passport
 initializePassport()
 app.use(passport.initialize())
 app.use(passport.session())
 
-// Handlebars as template engine
+// * Handlebars as template engine
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.resolve(__dirname, './views'))
 
-// Port setting
+// * Port setting
 app.set("port", process.env.PORT)
 
-// Router
+// * Router
 app.use('/', router)
 
-// Pathfile
+// * Pathfile
 app.use('/', express.static(__dirname + '/public'))
 
-// Nodemailer
+// * Nodemailer
 export const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,

@@ -10,9 +10,9 @@ routerCart.use(checkRole(Roles.USER))
 routerCart.route('/')
     .post(createNewCart)
     .get(getCart)
+    .put(overwriteCart)
 
 routerCart.route('/:cid')
-    .put(overwriteCart)
     .delete(clearCart)
 
 routerCart.route('/product/:pid')

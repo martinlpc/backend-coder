@@ -1,0 +1,307 @@
+paths:
+    /api/products?limit=10&page=1&category=Accesorios&stock=0&sort=ASC:
+        get:
+            summary: 'Return paginated products according to the sent parameters'
+            tags:
+                - Products
+            parameters:
+                - name: limit
+                  in: query
+                  description: 'Quantity of products to show per page. Default: 10'
+                  required: false
+                  schema:
+                      type: Number
+                - name: page
+                  in: query
+                  description: 'Page to return, if there is more than 1'
+                  required: false
+                  schema:
+                      type: Number
+                - name: category
+                  in: query
+                  description: 'Category filter'
+                  required: false
+                  schema:
+                      type: String
+                - name: stock
+                  in: query
+                  description: 'Return products with stock equal or greater than "stock" param'
+                  required: false
+                  schema:
+                      type: Number
+                - name: sort
+                  in: query
+                  description: 'Alphabetical arrangement ASCending or DESCending. If none, no arrangement is done'
+                  required: false
+                  schema:
+                      type: String
+            responses:
+                '200':
+                    description: 'List of paginated products'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/ProductsResponse'
+                '500':
+                    description: 'Error'
+    /api/products:
+        post:
+            summary: '(ADMIN level) Add product(s) to DB'
+            tags:
+                - Products
+            requestBody:
+                description: 'Object or object array, JSON format'
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#components/schemas/Product'
+            responses:
+                '201':
+                    description: Creado(s)
+                '400':
+                    description: Error en datos ingresados
+                '500':
+                    description: Error en el servidor
+    /api/products/{pid}:
+        get:
+            summary: 'Returns a product in JSON format'
+            tags:
+                - Products
+            parameters:
+                - name: pid
+                  in: path
+                  description: ObjectID of the product to search
+                  required: true
+                  schema:
+                      type: String
+            responses:
+                '200':
+                    description: Product found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#components/schemas/Product'
+        put:
+            summary: (ADMIN level) Updates/modifies a single product
+            tags:
+                - Products
+            parameters:
+                - name: pid
+                  in: path
+                  description: ObjectID of the product
+                  required: true
+                  schema:
+                      type: String
+            requestBody:
+                description: Object with pairs key=value to modify
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#components/schemas/ModifyProduct'
+
+            responses:
+                '200':
+                    description: Product updated
+                    content:
+                        text/plain:
+                            schema:
+                                type: String
+                                example: Product up-to-date
+                '404':
+                    description: Product not found
+                    content:
+                        text/plain:
+                            schema:
+                                type: String
+                                example: Product not found
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                type: Object
+                                properties:
+                                    status:
+                                        type: String
+                                    message:
+                                        type: String
+                                example:
+                                    status: Error on updating product
+                                    message: Internal server error
+        delete:
+            summary: (ADMIN level) Deletes a single product
+            tags:
+                - Products
+            parameters:
+                - name: pid
+                  in: path
+                  description: Product ObjectID
+                  required: true
+                  schema:
+                      type: String
+
+            responses:
+                '200':
+                    description: Product deleted
+                    content:
+                        application/json:
+                            schema:
+                                type: Object
+                                properties:
+                                    status:
+                                        type: String
+                                    message:
+                                        type: String
+                                example:
+                                    status: Success
+                                    message: 'Product {product.title} [CODE: {product.code}] deleted'
+                '404':
+                    description: Product not found
+                    content:
+                        text/plain:
+                            schema:
+                                type: String
+                                example: Product not found
+                '500':
+                    description: Error
+                    content:
+                        application/json:
+                            schema:
+                                type: Object
+                                properties:
+                                    status:
+                                        type: String
+                                    message:
+                                        type: String
+                                example:
+                                    status: Error on deleting product
+                                    message: Internal server error
+
+components:
+    schemas:
+        ProductsResponse:
+            type: object
+            properties:
+                status:
+                    type: String
+                    description: 'Estado de la consulta: success/error'
+                payload:
+                    type: Array
+                    description: 'Productos devueltos en la consulta, si status = success'
+                    properties:
+                        _id:
+                            type: ObjectId
+                            description: 'ID autogenerado'
+                        title:
+                            type: String
+                            description: '[REQUIRED] Nombre del producto'
+                        description:
+                            type: String
+                            description: '[REQUIRED] Descripción del producto'
+                        code:
+                            type: String
+                            description: '[REQUIRED] Código de identificación interna del producto asignado por el usuario'
+                        price:
+                            type: String
+                            description: '[REQUIRED] Precio unitario del producto'
+                        status:
+                            type: Boolean
+                            description: 'Representa si el producto está activo o no'
+                        stock:
+                            type: Number
+                            description: '[REQUIRED] Stock del producto al cargarse'
+                        category:
+                            type: String
+                            description: '[REQUIRED] Categoría/tipo de producto'
+                        thumbnails:
+                            type: Array
+                            description: 'Array con las rutas de las imágenes a cargar del producto'
+                totalPages:
+                    type: Number
+                    description: Number of pages containing the related info
+                prevPage:
+                    type: Number
+                    description: Previous page number
+                nextPage:
+                    type: Number
+                    description: Next page number
+                page:
+                    type: Number
+                    description: Actual page number
+                hasPrevPage:
+                    type: Boolean
+                hasNextPage:
+                    type: Boolean
+                prevLink:
+                    type: String
+                    description: Link to the previous page API request
+                nextLink:
+                    type: String
+                    description: Link to the next page API request
+            example:
+                status: 'success'
+                payload:
+                    _id: ObjectId("12bb12bb12bb12bb12bb12bb")
+                    title: 'Kong Extreme Large'
+                    description: 'Juguete rellenable de comida super resistente para tu perro'
+                    code: 'KONG-DOG-L-FOOD'
+                    price: '4500.00'
+                    status: true
+                    stock: 10
+                    category: 'Juguetes'
+                    thumbnails: ['/kong_1.jpg', '/kong_2.jpg']
+                totalPages: 3
+                prevPage: 1
+                nextPage: 3
+                page: 2
+                hasPrevPage: true
+                hasNextPage: true
+                prevLink: '/api/products?page=1'
+                nextLink: '/api/products?page=3'
+        Product:
+            type: object
+            properties:
+                title:
+                    type: String
+                    description: '[REQUIRED] Nombre del producto'
+                description:
+                    type: String
+                    description: '[REQUIRED] Descripción del producto'
+                code:
+                    type: String
+                    description: '[REQUIRED] Código de identificación interna del producto asignado por el usuario'
+                price:
+                    type: String
+                    description: '[REQUIRED] Precio unitario del producto'
+                status:
+                    type: Boolean
+                    description: 'Representa si el producto está activo o no'
+                stock:
+                    type: Number
+                    description: '[REQUIRED] Stock del producto al cargarse'
+                category:
+                    type: String
+                    description: '[REQUIRED] Categoría/tipo de producto'
+                thumbnails:
+                    type: Array
+                    description: 'Array con las rutas de las imágenes a cargar del producto'
+            example:
+                title: 'Kong Extreme Large'
+                description: 'Juguete rellenable de comida super resistente para tu perro'
+                code: 'KONG-DOG-L-FOOD'
+                price: '4500.00'
+                status: true
+                stock: 10
+                category: 'Juguetes'
+                thumbnails: ['/kong_1.jpg', '/kong_2.jpg']
+        ModifyProduct:
+            type: object
+            properties:
+                key:
+                    type: String
+                    description: Nombre de la propiedad a modificar
+            example:
+                stock: 300
+                status: false
